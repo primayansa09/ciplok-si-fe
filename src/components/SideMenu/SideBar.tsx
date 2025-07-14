@@ -28,6 +28,9 @@ import { layoutPrivateStyle } from "../../style/layout/private-route";
 import logo from "../../assets/logo.png";
 import Avatar from "@mui/material/Avatar";
 import { Menu } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../store/auth/authSlice";
+import { RootState } from "../../store";
 
 const drawerWidth = 240;
 const settings = ["Logout"];
@@ -98,7 +101,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [profileMenu, setProfileMenu] = useState(false);
   const storedEmail = localStorage.getItem("dataLogin");
-
+const fullName = useSelector((state: RootState) => state.auth.fullName);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setProfileMenu(true);
   };
@@ -107,11 +110,14 @@ const Sidebar: React.FC = () => {
     setProfileMenu(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("dataLogin");
-    navigate("/login");
-    handleClose();
-  };
+const dispatch = useDispatch();
+
+const handleLogout = () => {
+  dispatch(logout()); // Reset Redux state + hapus sessionStorage token
+  localStorage.removeItem("dataLogin"); // Hapus email dari localStorage (opsional)
+  navigate("/login"); // Redirect ke login
+  handleClose(); // Tutup menu profile
+};
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -175,7 +181,7 @@ const Sidebar: React.FC = () => {
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Stack direction="row" alignItems="center" gap="16px">
-              <Typography sx={layoutPrivateStyle.headerTypography}>Welcome, {storedEmail}</Typography>
+              <Typography sx={layoutPrivateStyle.headerTypography}>Welcome, {fullName}</Typography>
               <Avatar
                 src="/static/images/avatar/2.jpg"
                 sx={layoutPrivateStyle.headerAvatar}
