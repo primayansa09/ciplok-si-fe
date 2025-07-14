@@ -48,6 +48,14 @@ export type ValidateError = {
     namaPenatua: boolean;
 }
 
+export interface DataApproval {
+  reservationDate: Date;
+  startTime: string;
+  roomName: string;
+}
+
+
+
 export interface LocationState {
     state: AppState;
 }

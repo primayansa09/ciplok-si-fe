@@ -21,10 +21,44 @@ import CloseIcon from "@mui/icons-material/Close";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { AppDispatch, RootState } from "../../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { DataApproval } from "../../../store/formPeminjaman/type";
+import { fetchDataApproval } from "../../../store/formPeminjaman/slice";
+import { format } from 'date-fns';
 
 export function DefaultApproval() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { data, loading, error, pageNumber, pageSize, totalPages, totalData } = useSelector(
+    (state: RootState) => state.dataReservation
+  );
+  const [filteredData, setFilteredData] = useState<DataApproval[]>([]);
+
+  const [page, setPage] = useState(pageNumber - 1);
+  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
+  const [searchData, setSearchData] = useState("");
+
+  useEffect(() => {
+    dispatch(
+      fetchDataApproval({
+        pageNumber: page + 1,
+        pageSize: rowsPerPage,
+        searchTerm: searchData,
+      })
+    );
+  }, [dispatch, page, rowsPerPage, searchData]);
+
+  useEffect(() => {
+    if (data) {
+      const filtered = data.filter((item) =>
+        item.roomName?.toLowerCase().includes(searchData.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [data, searchData]);
+
 
   const dataDummyApproval = [
     {
@@ -56,10 +90,7 @@ export function DefaultApproval() {
   const [dataBind, setDataBind] = useState({
     data: dataDummyApproval,
   });
-  const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -79,12 +110,6 @@ export function DefaultApproval() {
     navigate("/detail-approval", { replace: true });
   };
 
-  useEffect(() => {
-      const filtered = dataBind.data.filter((item: any) =>
-        item.ruangan?.toLowerCase().includes(searchData.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }, [searchData, dataBind.data]);
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -183,7 +208,7 @@ export function DefaultApproval() {
                 filteredData
                   .map((ex: any, index) => (
                     <TableRow
-                      key={ex.codePenatua}
+
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -191,7 +216,9 @@ export function DefaultApproval() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.tanggalPemakaian}
+                        {ex.reservationDate
+                          ? format(new Date(ex.reservationDate), "dd-MMMM-yyyy")
+                          : "N/A"}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -199,7 +226,7 @@ export function DefaultApproval() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.jamPemakaian}
+                        {ex.startTime}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -207,7 +234,7 @@ export function DefaultApproval() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.ruangan}
+                        {ex.roomName}
                       </TableCell>
                       <TableCell
                         sx={{

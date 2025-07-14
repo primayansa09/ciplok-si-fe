@@ -54,8 +54,8 @@ export interface DataMajelis {
   namaPenatua: string;
   jabatanPenatua: string;
   phoneNumber: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 

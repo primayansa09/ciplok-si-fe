@@ -101,7 +101,10 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [profileMenu, setProfileMenu] = useState(false);
   const storedEmail = localStorage.getItem("dataLogin");
+
   const fullName = useSelector((state: RootState) => state.auth.fullName);
+
+  console.log(fullName);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setProfileMenu(true);
   };
@@ -111,13 +114,12 @@ const Sidebar: React.FC = () => {
   };
 
   const dispatch = useDispatch();
-
   const handleLogout = () => {
-    dispatch(logout()); 
-    localStorage.removeItem("dataLogin");
+    dispatch(logout()); // Clear the Redux state
     navigate("/login");
     handleClose();
   };
+
 
   const handleDrawerOpen = () => {
     setOpen(true);

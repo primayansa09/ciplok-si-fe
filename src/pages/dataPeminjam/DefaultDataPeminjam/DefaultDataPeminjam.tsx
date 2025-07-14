@@ -24,11 +24,13 @@ import logo from "../../../assets/logo.png";
 import { Data, DataFilter } from "../../../store/dataPeminjam/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store";
 
 export function DefaultDataPeminjam() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
+  const dispatch = useDispatch<AppDispatch>();
   const dataDummyPeminjam = [
     {
       codePenatua: "PNT001",

@@ -3,7 +3,7 @@ import {
   Box, TextField, Typography, Button, Grid, Paper, Stack
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../store/auth/authSlice";
+import { login, setTokenFromSession } from "../../store/auth/authSlice"; // Import setTokenFromSession
 import { AppDispatch, RootState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
@@ -15,6 +15,15 @@ export function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Memeriksa apakah ada token di sessionStorage dan men-setnya di Redux
+  useEffect(() => {
+    dispatch(setTokenFromSession()); // Cek dan update token jika ada di sessionStorage
+    if (auth.token) {
+      navigate("/master-data/data-majelis"); // Redirect jika token ada
+    }
+  }, [auth.token, dispatch, navigate]);
+
 
   const handleLogin = async () => {
     const resultAction = await dispatch(login({ email, password }));

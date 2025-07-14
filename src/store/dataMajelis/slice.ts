@@ -24,14 +24,12 @@ const initialState: DataMajelisState = {
   totalData: 0,
 };
 
-// Definisikan parameter untuk fetchDataMajelis
 interface FetchParams {
   pageNumber: number;
   pageSize: number;
   searchTerm: string;
 }
 
-// Perbaikan pada fetchDataMajelis untuk menerima parameter
 export const fetchDataMajelis = createAsyncThunk(
   'dataMajelis/fetch',
   async (params: FetchParams, thunkAPI) => {

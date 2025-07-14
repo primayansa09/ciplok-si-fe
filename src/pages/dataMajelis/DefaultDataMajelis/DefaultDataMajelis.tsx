@@ -19,12 +19,14 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import { DataMajelis } from "../../../store/dataMajelis/type"; 
+import { DataMajelis } from "../../../store/dataMajelis/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
 import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
+import { format } from 'date-fns'; // Import format from date-fns
+
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
@@ -211,7 +213,9 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {/* {ex.periodeAwal} */}
+                        {ex.startDate
+                          ? format(new Date(ex.startDate), "dd-MMMM-yyyy")
+                          : "N/A"}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -219,7 +223,9 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {/* {ex.periodeAkhir} */}
+                        {ex.endDate
+                          ? format(new Date(ex.endDate), "dd-MMMM-yyyy")
+                          : "N/A"}
                       </TableCell>
                       <TableCell
                         sx={{
