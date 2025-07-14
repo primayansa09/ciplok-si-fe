@@ -1,0 +1,1 @@
+export {DefaultDataPeminjam} from './DefaultDataPeminjam'

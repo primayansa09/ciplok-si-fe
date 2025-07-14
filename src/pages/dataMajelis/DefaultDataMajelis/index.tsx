@@ -1,0 +1,1 @@
+export { DefaultDataMajelis } from './DefaultDataMajelis';

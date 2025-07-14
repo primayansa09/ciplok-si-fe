@@ -1,0 +1,1 @@
+export {DefaultDataKegiatan} from './DefaultDataKegiatan';

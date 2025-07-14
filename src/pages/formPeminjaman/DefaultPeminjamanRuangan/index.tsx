@@ -1,0 +1,1 @@
+export {DefaultPeminjamanRuangan} from './DefaultPeminjamanRuangan';

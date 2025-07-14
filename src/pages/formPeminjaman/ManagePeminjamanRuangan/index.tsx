@@ -1,0 +1,1 @@
+export {ManagePeminjamanRuangan} from './ManagePeminjamanRuangan';

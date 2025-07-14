@@ -1,0 +1,1 @@
+export {DetailApproval} from './DetailApproval';

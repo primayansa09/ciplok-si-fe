@@ -1,0 +1,1 @@
+export {DefaultDataRuangan} from "./DefaultDataRuangan"
