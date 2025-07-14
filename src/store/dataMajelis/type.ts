@@ -34,13 +34,13 @@ export type Data = {
 
 export type DataInsert = {
     id: string;
-    codePenatua: string | null;
-    namaPenatua: string | null;
+    codePnt: string | null;
+    fullName: string | null;
     jabatanPenatua: string | null;
     alamatPenatua: string | null;
     noWhatsapp: string | null;
-    awalPeriode: Date;
-    akhirPeriode: Date;
+    startDate: Date;
+    endDate: Date;
 };
 
 export type ValidateError = {

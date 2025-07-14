@@ -10,19 +10,20 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { fetchJabatanPenatua } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
+import { createDataMajelis } from "../../../api/dataMajelis";
 
 export function ManageMajelis() {
   const [awalPeriode, setAwalPeriode] = useState<Dayjs | null>(null);
   const [akhirPeriode, setAkhirPeriode] = useState<Dayjs | null>(null);
   const [formDataMajelis, setFormDataMajelis] = useState<DataInsert>({
     id: "",
-    codePenatua: "",
-    namaPenatua: "",
+    codePnt: "",
+    fullName: "",
     jabatanPenatua: "",
     alamatPenatua: "",
     noWhatsapp: "",
-    awalPeriode: new Date(),
-    akhirPeriode: new Date(),
+    startDate: new Date(),
+    endDate: new Date(),
   });
   const [errors, setErrors] = useState({
     namaPenatua: false,
@@ -53,9 +54,9 @@ export function ManageMajelis() {
     fetchJabatan();
   }, [IsEdit, itemData]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {
-      namaPenatua: formDataMajelis.namaPenatua?.trim() === "" || formDataMajelis.namaPenatua === null,
+      namaPenatua: formDataMajelis.fullName?.trim() === "" || formDataMajelis.fullName === null,
       noWhatsapp: formDataMajelis.noWhatsapp?.trim() === "" || formDataMajelis.noWhatsapp === null,
     };
 
@@ -66,8 +67,26 @@ export function ManageMajelis() {
     if (!isValid) {
       return;
     }
-
-    console.log("Form submitted:", formDataMajelis);
+    try {
+     const response = await createDataMajelis(formDataMajelis);
+      if (response.status === 200) {
+        console.log("Data submitted successfully:", response.data);
+        setFormDataMajelis({
+          id: "",
+          codePnt: "",
+          fullName: "",
+          jabatanPenatua: "",
+          alamatPenatua: "",
+          noWhatsapp: "",
+          startDate: new Date(),
+          endDate: new Date(),
+        });
+      } else {
+        console.error("Error submitting data:", response.data);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   const handleAwalPeriodeChange = (value: Dayjs | null) => {
@@ -86,7 +105,7 @@ export function ManageMajelis() {
     const query = e.target.value;
     setFormDataMajelis({
       ...formDataMajelis,
-      namaPenatua: query,
+      fullName: query,
     });
     setErrors({
       namaPenatua: query.trim() === "",
@@ -97,13 +116,10 @@ export function ManageMajelis() {
       setSearchResults([]);
       return;
     }
-
     setLoading(true);
-
     try {
-      const results = await fetchNamaPenatua(query); // Fetching results from the backend API
+      const results = await fetchNamaPenatua(query);
       setSearchResults(results);
-      
     } catch (error) {
       console.error("Error fetching search results:", error);
     } finally {
@@ -114,11 +130,11 @@ export function ManageMajelis() {
   const handleSelectResult = (result: DataUserMajelis) => {
     setFormDataMajelis({
       ...formDataMajelis,
-      namaPenatua: result.fullName,
+      fullName: result.fullName,
       alamatPenatua: result.address,
       noWhatsapp: result.phoneNo,
     });
-    setSearchResults([]); // Clear the results after selection
+    setSearchResults([]);
   };
 
   const [jabatanPenatuaList, setJabatanPenatuaList] = useState<DataSettings[]>([]);
@@ -149,11 +165,11 @@ export function ManageMajelis() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataMajelis.codePenatua}
+              value={formDataMajelis.codePnt}
               onChange={(e) =>
                 setFormDataMajelis({
                   ...formDataMajelis,
-                  codePenatua: e.target.value,
+                  codePnt: e.target.value,
                 })
               }
             />
@@ -177,7 +193,7 @@ export function ManageMajelis() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataMajelis.namaPenatua}
+              value={formDataMajelis.fullName}
               onChange={handleSearch}
               error={errors.namaPenatua}
               helperText={errors.namaPenatua ? "Nama Penatua wajib diisi" : ""}
