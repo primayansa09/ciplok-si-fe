@@ -60,36 +60,6 @@ export function DefaultApproval() {
   }, [data, searchData]);
 
 
-  const dataDummyApproval = [
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      status: "approve",
-    },
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      status: "reject",
-    },
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      status: "pending",
-    },
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      status: "processing",
-    },
-  ];
-
-  const [dataBind, setDataBind] = useState({
-    data: dataDummyApproval,
-  });
 
 
   const handleChangePage = (
@@ -292,8 +262,8 @@ export function DefaultApproval() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
-            page={page}
+            count={totalData}
+            page={totalPages}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}

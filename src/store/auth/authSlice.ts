@@ -42,7 +42,9 @@ const authSlice = createSlice({
       state.fullName = '';
       state.roleName = '';
       sessionStorage.removeItem('token');
-      localStorage.removeItem('role'); // Hapus juga role dari localStorage saat logout
+      sessionStorage.clear();
+      // localStorage.removeItem('role');
+      localStorage.clear()
     },
     setTokenFromSession(state) {
       const token = sessionStorage.getItem('token');
@@ -69,8 +71,6 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.fullName = action.payload.fullName;
         state.roleName = action.payload.roleName;
-
-        // Menyimpan token dan role ke sessionStorage dan localStorage
         sessionStorage.setItem('token', action.payload.token);
         localStorage.setItem('role',action.payload.roleName);
         localStorage.setItem('fullName',action.payload.fullName);
