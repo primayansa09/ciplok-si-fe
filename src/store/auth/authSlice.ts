@@ -6,6 +6,8 @@ interface AuthState {
   token: string | null;
   fullName: string;
   roleName: string;
+  jabatanPenatua: string;
+  anggotaKomisi: string;
   loading: boolean;
   error: string | null;
 }
@@ -14,6 +16,8 @@ const initialState: AuthState = {
   token: null,
   fullName: '',
   roleName: '',
+  jabatanPenatua: '',
+  anggotaKomisi: '',
   loading: false,
   error: null,
 };
@@ -50,14 +54,18 @@ const authSlice = createSlice({
       const token = sessionStorage.getItem('token');
       const role = localStorage.getItem('role');
       const fullName = localStorage.getItem('fullName');
+      const anggotaKomisi = localStorage.getItem('anggotaKomisi');
+      const jabatanPenatua = localStorage.getItem('jabatanPenatua');
       if (token) {
         state.token = token;
       }
       if (role) {
         state.roleName = role;
         state.fullName = fullName || "";
+        state.jabatanPenatua = jabatanPenatua || "";
+        state.anggotaKomisi = anggotaKomisi || "";
       }
-   
+
     },
   },
   extraReducers: (builder) => {
@@ -72,8 +80,10 @@ const authSlice = createSlice({
         state.fullName = action.payload.fullName;
         state.roleName = action.payload.roleName;
         sessionStorage.setItem('token', action.payload.token);
-        localStorage.setItem('role',action.payload.roleName);
-        localStorage.setItem('fullName',action.payload.fullName);
+        localStorage.setItem('role', action.payload.roleName);
+        localStorage.setItem('fullName', action.payload.fullName);
+        localStorage.setItem('jabatanPenatua', action.payload.jabatanPenatua);
+        localStorage.setItem('anggotaKomisi', action.payload.anggotaKomisi);
       })
       .addCase(login.rejected, (state, action: any) => {
         state.loading = false;

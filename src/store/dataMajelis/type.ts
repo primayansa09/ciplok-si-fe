@@ -59,6 +59,13 @@ export interface DataMajelis {
 }
 
 
+export interface DataUserMajelis {
+  fullName: string;
+  address: string;
+  phoneNo:string;
+}
+
+
 export interface LocationState {
     state: AppState;
 }
