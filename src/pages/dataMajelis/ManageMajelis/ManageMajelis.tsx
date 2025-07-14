@@ -16,6 +16,7 @@ import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { DataInsert } from "../../../store/dataMajelis/type";
 
 export function ManageMajelis() {
   const [awalPeriode, setAwalPeriode] = React.useState<Dayjs | null>(null);
@@ -25,15 +26,15 @@ export function ManageMajelis() {
   const location = useLocation();
   const { itemData, mode, IsEdit } = location.state || {};
 
-  const [formDataMajelis, setFormDataMajelis] = useState({
+  const [formDataMajelis, setFormDataMajelis] = useState<DataInsert>({
+    id: "",
     codePenatua: "",
     namaPenatua: "",
-    jabatan: "",
+    jabatanPenatua: "",
     alamatPenatua: "",
     noWhatsapp: "",
-    periodeAwal: "",
-    periodeAkhir: "",
-    anggotaKomisi: "",
+    awalPeriode: new Date(),  // Default to current date or adjust as needed
+    akhirPeriode: new Date(), // Default to current date or adjust as needed
   });
 
   const [errors, setErrors] = useState({
@@ -43,8 +44,8 @@ export function ManageMajelis() {
 
   const handleSubmit = () => {
     const newErrors = {
-      namaPenatua: formDataMajelis.namaPenatua.trim() === "",
-      noWhatsapp: formDataMajelis.noWhatsapp.trim() === "",
+      namaPenatua: formDataMajelis.namaPenatua?.trim() === "" || formDataMajelis.namaPenatua === null,
+      noWhatsapp: formDataMajelis.noWhatsapp?.trim() === "" || formDataMajelis.noWhatsapp === null,
     };
 
     setErrors(newErrors);
@@ -57,6 +58,7 @@ export function ManageMajelis() {
 
     console.log("Form submitted:", formDataMajelis);
   };
+
 
   useEffect(() => {
     if (IsEdit && itemData) {
@@ -115,7 +117,7 @@ export function ManageMajelis() {
                   codePenatua: e.target.value,
                 })
               }
-              disabled
+
             />
           </Grid>
         </Grid>
@@ -165,11 +167,11 @@ export function ManageMajelis() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataMajelis.jabatan}
+              value={formDataMajelis.jabatanPenatua}
               onChange={(e) =>
                 setFormDataMajelis({
                   ...formDataMajelis,
-                  jabatan: e.target.value,
+                  jabatanPenatua: e.target.value,
                 })
               }
               disabled
