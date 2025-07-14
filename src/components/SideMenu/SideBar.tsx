@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [profileMenu, setProfileMenu] = useState(false);
   const storedEmail = localStorage.getItem("dataLogin");
-const fullName = useSelector((state: RootState) => state.auth.fullName);
+  const fullName = useSelector((state: RootState) => state.auth.fullName);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setProfileMenu(true);
   };
@@ -110,14 +110,14 @@ const fullName = useSelector((state: RootState) => state.auth.fullName);
     setProfileMenu(false);
   };
 
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-const handleLogout = () => {
-  dispatch(logout()); // Reset Redux state + hapus sessionStorage token
-  localStorage.removeItem("dataLogin"); // Hapus email dari localStorage (opsional)
-  navigate("/login"); // Redirect ke login
-  handleClose(); // Tutup menu profile
-};
+  const handleLogout = () => {
+    dispatch(logout()); 
+    localStorage.removeItem("dataLogin");
+    navigate("/login");
+    handleClose();
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -236,9 +236,9 @@ const handleLogout = () => {
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
               {theme.direction === "ltr" ? (
-                <ChevronLeftIcon sx={{ color: "white", width: "35px", height: "35px" }}/>
+                <ChevronLeftIcon sx={{ color: "white", width: "35px", height: "35px" }} />
               ) : (
-                <ChevronRightIcon sx={{ color: "white", width: "35px", height: "35px" }}/>
+                <ChevronRightIcon sx={{ color: "white", width: "35px", height: "35px" }} />
               )}
             </IconButton>
           </DrawerHeader>
@@ -251,7 +251,7 @@ const handleLogout = () => {
                   sx={{
                     backgroundColor:
                       location.pathname.startsWith(item.link) &&
-                      !item.collapseList
+                        !item.collapseList
                         ? "#DDA853"
                         : "inherit",
                   }}

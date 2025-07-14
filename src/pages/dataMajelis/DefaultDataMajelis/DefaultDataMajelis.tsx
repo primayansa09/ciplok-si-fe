@@ -19,61 +19,44 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import { Data, DataFilter } from "../../../store/dataMajelis/type";
+import { DataMajelis } from "../../../store/dataMajelis/type"; 
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../store";
+import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { data, loading, error, pageNumber, pageSize, totalPages, totalData } = useSelector(
+    (state: RootState) => state.dataMajelis
+  );
+
   const [open, setOpen] = useState(false);
-
-  const dataDummyMajelis = [
-    {
-      codePenatua: "PNT001",
-      namaPenatua: "Wanda Primayansa",
-      jabatan: "Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsapp: "081234567890",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-    },
-    {
-      codePenatua: "PNT002",
-      namaPenatua: "Sinta Dewi",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsapp: "082345678901",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-    },
-    {
-      codePenatua: "PNT003",
-      namaPenatua: "Budi Santoso",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsapp: "083456789012",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsapp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-    },
-  ];
-
-  const [dataBind, setDataBind] = useState({
-    data: dataDummyMajelis,
-  });
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
+  const [filteredData, setFilteredData] = useState<DataMajelis[]>([]);
+  const [page, setPage] = useState(pageNumber - 1);
+  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
 
-  const [page, setPage] = useState(2);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  useEffect(() => {
+    dispatch(
+      fetchDataMajelis({
+        pageNumber: page + 1,
+        pageSize: rowsPerPage,
+        searchTerm: searchData,
+      })
+    );
+  }, [dispatch, page, rowsPerPage, searchData]);
+
+  useEffect(() => {
+    if (data) {
+      const filtered = data.filter((item) =>
+        item.codePenatua?.toLowerCase().includes(searchData.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [data, searchData]);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -93,7 +76,7 @@ export function DefaultDataMajelis() {
     navigate("/manage-majelis", { replace: true });
   };
 
-  const clickEditData = (item: Data) => {
+  const clickEditData = (item: DataMajelis) => {
     navigate("/manage-majelis", {
       state: {
         itemData: item,
@@ -108,12 +91,8 @@ export function DefaultDataMajelis() {
     setOpen(false);
   };
 
-  useEffect(() => {
-  const filtered = dataBind.data.filter((item: any) =>
-    item.codePenatua?.toLowerCase().includes(searchData.toLowerCase())
-  );
-  setFilteredData(filtered);
-}, [searchData, dataBind.data]);
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -148,7 +127,6 @@ export function DefaultDataMajelis() {
           <Grid size={2}>
             <TextField
               id="standard-basic"
-              label=""
               variant="standard"
               fullWidth
               value={searchData}
@@ -164,177 +142,129 @@ export function DefaultDataMajelis() {
           <Table sx={{ minWidth: 720 }} size="small" aria-label="a dense table">
             <TableHead sx={layoutPrivateStyle.moduleTableHead}>
               <TableRow sx={layoutPrivateStyle.manageTableRow}>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Code Panatua
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Nama Panatua
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Jabatan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  No WhatsApp
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Awal Periode
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Akhir Periode
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Aksi
-                </TableCell>
+                {[
+                  "Code Penatua",
+                  "Nama Penatua",
+                  "Jabatan",
+                  "No WhatsApp",
+                  "Awal Periode",
+                  "Akhir Periode",
+                  "Aksi",
+                ].map((label) => (
+                  <TableCell
+                    key={label}
+                    sx={{
+                      ...layoutPrivateStyle.manageTableCell,
+                      color: "white",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    {label}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
               {filteredData.length > 0 ? (
-                filteredData.map((ex: any, index) => (
-                  <TableRow
-                    key={ex.codePenatua}
-                    sx={{
-                      "&:last-child td, &:last-child th": {
-                        border: 0,
-                      },
-                    }}
-                  >
-                    <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                      {ex.codePenatua}
-                    </TableCell>
-                    <TableCell
+                filteredData
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((ex) => (
+                    <TableRow
+                      key={ex.codePenatua}
                       sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
+                        "&:last-child td, &:last-child th": {
+                          border: 0,
+                        },
                       }}
                     >
-                      {ex.namaPenatua}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.jabatan}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.noWhatsapp}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.periodeAwal}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.periodeAkhir}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="row"
-                        justifyContent="center"
-                        gap={1}
+                      <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                        {ex.codePenatua}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
                       >
-                        <InputLabel
-                          onClick={() => clickEditData(ex)}
-                          sx={{
-                            ...layoutPrivateStyle.manageTitleAction,
-                            cursor: "pointer",
-                            marginBottom: "5px",
-                          }}
+                        {ex.namaPenatua}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {ex.jabatanPenatua}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {ex.phoneNumber}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {/* {ex.periodeAwal} */}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {/* {ex.periodeAkhir} */}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          justifyContent="center"
+                          gap={1}
                         >
-                          <EditIcon />
-                        </InputLabel>
-                        <InputLabel
-                          onClick={() => setOpen(true)}
-                          sx={{
-                            ...layoutPrivateStyle.manageTitleAction,
-                            cursor: "pointer",
-                          }}
-                        >
-                          <DeleteIcon />
-                        </InputLabel>
-                        <ConfirmDeleteModal
-                          open={open}
-                          onClose={() => setOpen(false)}
-                          onConfirm={handleDelete}
-                        />
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
+                          <InputLabel
+                            onClick={() => clickEditData(ex)}
+                            sx={{
+                              ...layoutPrivateStyle.manageTitleAction,
+                              cursor: "pointer",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            <EditIcon />
+                          </InputLabel>
+                          <InputLabel
+                            onClick={() => setOpen(true)}
+                            sx={{
+                              ...layoutPrivateStyle.manageTitleAction,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <DeleteIcon />
+                          </InputLabel>
+                          <ConfirmDeleteModal
+                            open={open}
+                            onClose={() => setOpen(false)}
+                            onConfirm={handleDelete}
+                          />
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
               ) : (
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
                   <TableCell colSpan={8} align="center">
                     No Data Available.
-                    <div>Please Click Search Button</div>
                   </TableCell>
                 </TableRow>
               )}
@@ -344,7 +274,7 @@ export function DefaultDataMajelis() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
+            count={totalData}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}

@@ -48,6 +48,17 @@ export type ValidateError = {
     namaPenatua: boolean;
 }
 
+
+export interface DataMajelis {
+  codePenatua: string;
+  namaPenatua: string;
+  jabatanPenatua: string;
+  phoneNumber: string;
+  startDate: string;
+  endDate: string;
+}
+
+
 export interface LocationState {
     state: AppState;
 }

@@ -1,11 +1,20 @@
 import axios from 'axios';
-// import { store } from './store';
-
 
 const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default apiClient;
