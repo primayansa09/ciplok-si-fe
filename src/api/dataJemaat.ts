@@ -71,3 +71,18 @@ export const createDataJemaat = (formData: DataInsert): Promise<ApiResponse<Bool
       throw error;
     });
 };
+
+
+export const updateDataJemaat = (userID: number, formData: DataInsert): Promise<ApiResponse<Boolean>> => {
+  console.log("Edit Jemaat form data:", formData);
+  return apiClient
+    .post(`${ApiJemaat.updateData}/${userID}`, formData)
+    .then((response) => {
+      const responseData = response.data;
+      return responseData;
+    })
+    .catch((error) => {
+      console.error("Error updating data:", error);
+      throw error;
+    });
+};

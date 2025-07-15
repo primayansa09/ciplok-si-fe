@@ -33,7 +33,7 @@ export type Data = {
 };
 
 export type DataInsert = {
-    userID: string;
+    userID: number;
     email: string | null;
     anggotaKomisi: string | null;
     password: string | null;

@@ -43,15 +43,28 @@ export type DataInsert = {
     deskripsi: string | null;
 };
 
+export type ReservationData = {
+    transactionID: number;
+    reservationDate: Date;
+    startTime: string;
+    description: string;
+    mjMengetahui: string;
+    peminjaman: string | null;
+    roomName: string | null;
+    createdBy: string | null;
+    deskripsi: string | null;
+
+};
+
 export type ValidateError = {
     codePenatua: boolean;
     namaPenatua: boolean;
 }
 
 export interface DataApproval {
-  reservationDate: Date;
-  startTime: string;
-  roomName: string;
+    reservationDate: Date;
+    startTime: string;
+    roomName: string;
 }
 
 

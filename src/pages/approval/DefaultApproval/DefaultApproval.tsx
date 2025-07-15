@@ -25,7 +25,8 @@ import { AppDispatch, RootState } from "../../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { DataApproval } from "../../../store/formPeminjaman/type";
 import { fetchDataApproval } from "../../../store/formPeminjaman/slice";
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
+import { fetchApprovalByDate } from "../../../api/dataApproval";
 
 export function DefaultApproval() {
   const navigate = useNavigate();
@@ -76,8 +77,25 @@ export function DefaultApproval() {
     setPage(0);
   };
 
-  const handleDetailApproval = () => {
-    navigate("/detail-approval", { replace: true });
+  const handleDetailApproval = async (ex: any) => {
+    let formattedDate = "";
+    let formattedTime = ex.startTime;
+    if (ex.reservationDate) {
+      const parsedDate = new Date(ex.reservationDate);
+
+      if (!isNaN(parsedDate.getTime())) {
+        formattedDate = format(parsedDate, "dd-MM-yyyy");
+      } else {
+        formattedDate = "Invalid Date";
+      }
+    }
+    navigate("/detail-approval", {
+      state: {
+        reservationDate: formattedDate,
+        startTime: formattedTime,
+        roomName: ex.roomName,
+      },
+    });
   };
 
 
@@ -235,7 +253,7 @@ export function DefaultApproval() {
                           gap={1}
                         >
                           <InputLabel
-                            onClick={handleDetailApproval}
+                            onClick={() => handleDetailApproval(ex)}
                             sx={{
                               ...layoutPrivateStyle.manageTitleAction,
                               cursor: "pointer",

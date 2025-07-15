@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   Grid,
@@ -20,7 +19,7 @@ import { DataInsert } from "../../../store/dataJemaat/type";
 import { fetchAnggotaKomisi } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
-import { createDataJemaat } from "../../../api/dataJemaat";
+import { createDataJemaat, updateDataJemaat } from "../../../api/dataJemaat";
 import MessageModal from "../../../components/Modal/MessageModal";
 
 export function ManageJemaat() {
@@ -32,14 +31,14 @@ export function ManageJemaat() {
   const [modalMessage, setModalMessage] = useState("");
   const [redirectTo, setRedirectTo] = useState("");
   const [formDataJemaat, setFormDataJemaat] = useState<DataInsert>({
-    userID: "0",
+    userID: 0,
     email: "",
     anggotaKomisi: "",
     password: "",
     phoneNo: "",
     fullName: "",
     address: "",
-    alternatePhoneNo: ""
+    alternatePhoneNo: "",
   });
 
   const [errors, setErrors] = useState({
@@ -49,69 +48,71 @@ export function ManageJemaat() {
     noWhatsApp: false,
   });
 
+  // Password visibility states
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Fetch anggota komisi data
+  useEffect(() => {
+    const fetchData = async () => {
+      const anggotaKomisiList = await fetchAnggotaKomisi("KCODE");
+      setAnggotaKomisi(anggotaKomisiList);
+    };
+    fetchData();
+  }, []);
+
+  // Initialize form data when in Edit mode
+  useEffect(() => {
+    if (IsEdit && itemData) {
+      setFormDataJemaat(itemData);
+    }
+  }, [IsEdit, itemData]);
+
+  // Handle form submission (create or update)
   const handleSubmit = async () => {
-    console.log(formDataJemaat)
     try {
       let response;
-      if (!IsEdit) {
+      if (formDataJemaat.userID == 0) {
         response = await createDataJemaat(formDataJemaat);
         if (response.statusCode === 200) {
           setFormDataJemaat({
-            userID: "",
+            userID: 0,
             email: "",
             anggotaKomisi: "",
             password: "",
             phoneNo: "",
             fullName: "",
             address: "",
-            alternatePhoneNo: ""
+            alternatePhoneNo: "",
+          });
+          setModalMessage(response.message || "Data created successfully!");
+          setRedirectTo("/master-data/data-jemaat");
+          setOpenModal(true);
+        }
+      } else {
+        response = await updateDataJemaat(formDataJemaat.userID, formDataJemaat);
+        if (response.statusCode === 200) {
+          setFormDataJemaat({
+            userID: 0,
+            email: "",
+            anggotaKomisi: "",
+            password: "",
+            phoneNo: "",
+            fullName: "",
+            address: "",
+            alternatePhoneNo: "",
           });
           setModalMessage(response.message || "Data updated successfully!");
           setRedirectTo("/master-data/data-jemaat");
           setOpenModal(true);
         }
-      } else {
-        // response = await updateDataMajelis(itemData.majelisID, formDataMajelis);
-        // if (response.status === 200) {
-        //   setFormDataMajelis({
-        //     majelisID: "",
-        //     userID: "",
-        //     codePnt: "",
-        //     fullName: "",
-        //     jabatanPenatua: "",
-        //     alamatPenatua: "",
-        //     phoneNo: "",
-        //     startDate: new Date(),
-        //     endDate: new Date(),
-        //   });
-
-        // }
       }
     } catch (error) {
       setModalMessage("An error occurred while submitting the form.");
       setOpenModal(true);
     }
-  }
-
-  useEffect(() => {
-    if (IsEdit && itemData) {
-      setFormDataJemaat(itemData);
-    }
-
-    const fetchData = async () => {
-      const anggotaKomisiList = await fetchAnggotaKomisi("KCODE");
-      setAnggotaKomisi(anggotaKomisiList);
-    };
-    fetchData();
-  }, [IsEdit, itemData]);
-
-  const clickCancel = () => {
-    navigate("/master-data/data-jemaat", { replace: true });
   };
 
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
+  // Handle password visibility toggle
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormDataJemaat({
       ...formDataJemaat,
@@ -123,31 +124,32 @@ export function ManageJemaat() {
     event.preventDefault(); // Prevent default behavior for mouse down
   };
 
+  // Modal close handler
   const closeModal = () => {
     setOpenModal(false);
   };
 
+  // Modal confirm handler (redirect after confirmation)
   const handleModalConfirm = () => {
     setOpenModal(false);
     navigate(redirectTo, { replace: true });
   };
+
+  // Cancel operation
+  const clickCancel = () => {
+    navigate("/master-data/data-jemaat", { replace: true });
+  };
+
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
-      <InputLabel
-        sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
-      >
+      <InputLabel sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}>
         Master Data Jemaat
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={2} alignItems={"center"} marginTop={5}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Nama Lengkap <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -169,14 +171,10 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Email <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -198,14 +196,10 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Password <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -238,15 +232,11 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
-              Anggota Komisi<span style={{ color: "red" }}>*</span>
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
+              Anggota Komisi <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
           <Grid size={4}>
@@ -270,14 +260,10 @@ export function ManageJemaat() {
             </Select>
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Alamat Lengkap <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -307,14 +293,10 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               No WhatsApp <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -336,14 +318,10 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={2.2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               No lain yang dapat dihubungi
             </InputLabel>
           </Grid>
@@ -363,12 +341,8 @@ export function ManageJemaat() {
             />
           </Grid>
         </Grid>
-        <Grid
-          container
-          spacing={2}
-          justifyContent={"flex-end"}
-          alignItems={"center"}
-          marginTop={2}>
+
+        <Grid container spacing={2} justifyContent={"flex-end"} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
             <Button
               type="submit"
@@ -386,6 +360,7 @@ export function ManageJemaat() {
               redirectTo={redirectTo}
             />
           </Grid>
+
           <Grid size={2}>
             <Button
               type="submit"
