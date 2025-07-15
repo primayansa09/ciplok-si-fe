@@ -28,22 +28,10 @@ export const sidebarMenu: ListItem[] = [
         key: "Data Majelis",
       },
       {
-        name: "Data Peminjam",
+        name: "Data Jemaat",
         icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
-        link: "/master-data/data-peminjam",
-        key: "Data Peminjam",
-      },
-      {
-        name: "Data Kegiatan",
-        icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
-        link: "/master-data/data-kegiatan",
-        key: "Data Kegiatan",
-      },
-      {
-        name: "Data Ruangan",
-        icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
-        link: "/master-data/data-ruangan",
-        key: "Data Ruangan",
+        link: "/master-data/data-jemaat",
+        key: "Data Jemaat",
       },
       {
         name: "Data Kriteria dan Sub Kriteria",

@@ -50,15 +50,12 @@ function App() {
             <Route element={<RequireAuth />}>
               <Route path="/" element={<Navigate to="/master-data/data-majelis" replace />} />
               <Route path="/master-data/data-majelis" element={<DataMajelis />} />
-              <Route path="/master-data/data-peminjam" element={<DataJemaat />} />
+              <Route path="/master-data/data-jemaat" element={<DataJemaat />} />
               <Route path="/master-data/data-kegiatan" element={<DataKegiatan />} />
               <Route path="/master-data/data-ruangan" element={<DataRuangan />} />
-              <Route path="/pinjam-ruangan/form-peminjaman" element={<PeminjamanRuangan />} />
               <Route path="/pinjam-ruangan/approval" element={<Approval />} />
               <Route path="/manage-majelis" element={<ManageMajelis />} />
               <Route path="/manage-peminjam" element={<ManageJemaat />} />
-              <Route path="/manage-kegiatan" element={<ManageKegiatan />} />
-              <Route path="/manage-ruangan" element={<ManageRuangan />} />
               <Route path="/manage-peminjaman-ruangan" element={<ManagePeminjamanRuangan />} />
               <Route path="/detail-approval" element={<DetailApproval />} />
               <Route path="/kriteria-sub-kriteria" element={<KriteriadanSubKriteria />} />

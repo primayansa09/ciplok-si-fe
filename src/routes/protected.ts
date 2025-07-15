@@ -1,8 +1,5 @@
 import { ManageMajelis } from "../pages/dataMajelis/ManageMajelis";
 import {ManageJemaat} from "../pages/dataJemaat/ManageDataJemaat";
-import { ManageKegiatan } from "../pages/dataKegiatan/ManageDataKegiatan";
-import { ManageRuangan } from "../pages/dataRuangan/ManageRuangan";
-import { ManagePeminjamanRuangan } from "../pages/formPeminjaman/ManagePeminjamanRuangan";
 import { DetailApproval } from "../pages/approval/DetailApproval";
 import { Login } from "../pages/login/login";
 import { Route } from "../types/route";
@@ -18,39 +15,12 @@ export const protectedRoutes: Route[] = [
     isEnabled: true,
     appendDivider: true,
   },
-  {
-    key: "manage-peminjam",
-    title: "Peminjam",
-    description: "Peminjam",
+   {
+    key: "manage-jemaat",
+    title: "Jemaat",
+    description: "Jemaat",
     component: ManageJemaat,
-    path: "/manage-majelis",
-    isEnabled: true,
-    appendDivider: true,
-  },
-  {
-    key: "manage-kegiatan",
-    title: "Kegiatan",
-    description: "Kegiatan",
-    component: ManageKegiatan,
-    path: "/manage-kegiatan",
-    isEnabled: true,
-    appendDivider: true,
-  },
-  {
-    key: "manage-ruangan",
-    title: "Ruangan",
-    description: "Ruangan",
-    component: ManageRuangan,
-    path: "/manage-ruangan",
-    isEnabled: true,
-    appendDivider: true,
-  },
-  {
-    key: "manage-peminjaman-ruangan",
-    title: "Peminjaman Ruangan",
-    description: "Peminjaman Ruangan",
-    component: ManagePeminjamanRuangan,
-    path: "/manage-peminjaman-ruangan",
+    path: "/manage-jemaat",
     isEnabled: true,
     appendDivider: true,
   },
