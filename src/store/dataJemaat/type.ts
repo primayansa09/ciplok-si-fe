@@ -22,25 +22,25 @@ export type DataFilter = {
 };
 
 export type Data = {
-    id: string;
-    codePenatua: string | null;
-    namaPenatua: string | null;
-    jabatanPenatua: string | null;
-    alamatPenatua: string | null;
-    noWhatsapp: string | null;
-    awalPeriode: Date;
-    akhirPeriode: Date;
+    userID: string;
+    email: string | null;
+    anggotaKomisi: string | null;
+    password: string | null;
+    phoneNo: string | null;
+    fullName: string;
+    address: string;
+    alternatePhoneNo: string;
 };
 
 export type DataInsert = {
-    id: string;
-    codePenatua: string | null;
-    namaPenatua: string | null;
-    jabatanPenatua: string | null;
-    alamatPenatua: string | null;
-    noWhatsapp: string | null;
-    awalPeriode: Date;
-    akhirPeriode: Date;
+    userID: number;
+    email: string | null;
+    anggotaKomisi: string | null;
+    password: string | null;
+    phoneNo: string | null;
+    fullName: string;
+    address: string;
+    alternatePhoneNo: string;
 };
 
 export type ValidateError = {

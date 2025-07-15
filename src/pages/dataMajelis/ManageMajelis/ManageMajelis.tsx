@@ -4,17 +4,19 @@ import { Button, Grid, Stack, TextField, InputLabel, Paper, CircularProgress, Se
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { DataInsert, DataUserMajelis } from "../../../store/dataMajelis/type";
-import { fetchNamaPenatua } from "../../../api/getAllUser";
+import { fetchNamaPenatua } from "../../../api/dataJemaat";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { fetchJabatanPenatua } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
 import { createDataMajelis, updateDataMajelis } from "../../../api/dataMajelis";
+import MessageModal from "../../../components/Modal/MessageModal";
 
 export function ManageMajelis() {
   const [awalPeriode, setAwalPeriode] = useState<Dayjs | null>(null);
   const [akhirPeriode, setAkhirPeriode] = useState<Dayjs | null>(null);
+  const [jabatanPenatuaList, setJabatanPenatuaList] = useState<DataSettings[]>([]);
   const [formDataMajelis, setFormDataMajelis] = useState<DataInsert>({
     majelisID: "",
     userID: "",
@@ -32,13 +34,14 @@ export function ManageMajelis() {
   });
   const [searchResults, setSearchResults] = useState<DataUserMajelis[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [redirectTo, setRedirectTo] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { itemData, mode, IsEdit } = location.state || {};
 
   useEffect(() => {
-    console.log(itemData)
     if (IsEdit && itemData) {
       setFormDataMajelis(itemData);
     }
@@ -50,7 +53,7 @@ export function ManageMajelis() {
       setAkhirPeriode(dayjs(itemData.endDate));
     }
     const fetchJabatan = async () => {
-      const jabatanData = await fetchJabatanPenatua();
+      const jabatanData = await fetchJabatanPenatua("JCODE");
       setJabatanPenatuaList(jabatanData);
     };
 
@@ -62,19 +65,35 @@ export function ManageMajelis() {
       namaPenatua: formDataMajelis.fullName?.trim() === "" || formDataMajelis.fullName === null,
       phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
     };
-
     setErrors(newErrors);
-
     const isValid = !Object.values(newErrors).includes(true);
-
     if (!isValid) {
       return;
     }
+
     try {
+      let response;
       if (!IsEdit) {
-        const response = await createDataMajelis(formDataMajelis);
+        response = await createDataMajelis(formDataMajelis);
+        if (response.statusCode === 200) {
+          setFormDataMajelis({
+            majelisID: "",
+            userID: "",
+            codePnt: "",
+            fullName: "",
+            jabatanPenatua: "",
+            alamatPenatua: "",
+            phoneNo: "",
+            startDate: new Date(),
+            endDate: new Date(),
+          });
+          setModalMessage(response.message || "Data submitted successfully!");
+          setRedirectTo("/master-data/data-majelis");
+          setOpenModal(true);
+        }
+      } else {
+        response = await updateDataMajelis(itemData.majelisID, formDataMajelis);
         if (response.status === 200) {
-          console.log("Data submitted successfully:", response.data);
           setFormDataMajelis({
             majelisID: "",
             userID: "",
@@ -87,28 +106,14 @@ export function ManageMajelis() {
             endDate: new Date(),
           });
 
-        }
-        navigate("/master-data/data-majelis", { replace: true });
-      } else {
-          console.log('3213123')
-        const response = await updateDataMajelis(itemData.majelisID, formDataMajelis);
-        console.log(response.message)
-        if (response.status === 200) {
-          setFormDataMajelis({
-            majelisID: "",
-            userID: "",
-            codePnt: "",
-            fullName: "",
-            jabatanPenatua: "",
-            alamatPenatua: "",
-            phoneNo: "",
-            startDate: new Date(),
-            endDate: new Date(),
-          });
+          setModalMessage(response.message || "Data updated successfully!");
+          setRedirectTo("/master-data/data-majelis");
+          setOpenModal(true);
         }
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      setModalMessage("An error occurred while submitting the form.");
+      setOpenModal(true);
     }
   };
 
@@ -173,25 +178,25 @@ export function ManageMajelis() {
     setSearchResults([]);
   };
 
-  const [jabatanPenatuaList, setJabatanPenatuaList] = useState<DataSettings[]>([]);
+  const closeModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);
+    navigate(redirectTo, { replace: true });
+  };
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
-      <InputLabel
-        sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
-      >
+      <InputLabel sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}>
         Master Data Majelis
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={2} alignItems={"center"} marginTop={5}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Code Penatua
             </InputLabel>
           </Grid>
@@ -214,12 +219,7 @@ export function ManageMajelis() {
 
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Nama Penatua <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -236,7 +236,6 @@ export function ManageMajelis() {
               label="Nama Penatua"
               disabled={IsEdit}
             />
-
             <TextField
               id="outlined-basic"
               variant="outlined"
@@ -250,7 +249,6 @@ export function ManageMajelis() {
                 })
               }
               hidden
-
             />
             {loading && <CircularProgress size={24} />}
             {searchResults.length > 0 && (
@@ -276,12 +274,7 @@ export function ManageMajelis() {
 
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Jabatan Penatua
             </InputLabel>
           </Grid>
@@ -308,12 +301,7 @@ export function ManageMajelis() {
         </Grid>
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Alamat Penatua
             </InputLabel>
           </Grid>
@@ -344,12 +332,7 @@ export function ManageMajelis() {
         </Grid>
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               No WhatsApp <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
@@ -373,12 +356,7 @@ export function ManageMajelis() {
         </Grid>
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Awal Periode
             </InputLabel>
           </Grid>
@@ -398,12 +376,7 @@ export function ManageMajelis() {
         </Grid>
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
               Akhir Periode
             </InputLabel>
           </Grid>
@@ -422,13 +395,7 @@ export function ManageMajelis() {
             </LocalizationProvider>
           </Grid>
         </Grid>
-        <Grid
-          container
-          spacing={2}
-          justifyContent={"flex-end"}
-          alignItems={"center"}
-          marginTop={2}
-        >
+        <Grid container spacing={2} justifyContent={"flex-end"} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
             <Button
               type="submit"
@@ -438,6 +405,13 @@ export function ManageMajelis() {
             >
               Submit
             </Button>
+            <MessageModal
+              open={openModal}
+              onClose={closeModal}
+              onConfirm={handleModalConfirm}
+              message={modalMessage}
+              redirectTo={redirectTo}
+            />
           </Grid>
           <Grid size={2}>
             <Button

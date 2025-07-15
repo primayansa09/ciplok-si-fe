@@ -21,7 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import logo from "../../../assets/logo.png";
-import { Data, DataFilter } from "../../../store/dataPeminjam/type";
+import { Data, DataFilter } from "../../../store/kriteriaSubKriteria/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 

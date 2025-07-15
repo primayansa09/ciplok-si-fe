@@ -1,6 +1,7 @@
 import apiClient from "../config/api-client";
 import { DataMajelisAPI } from "../constants/apiDataMajelis";
 import { DataFilter, DataInsert, DataMajelis, DataResponse } from "../store/dataMajelis/type";
+import { ApiResponse } from "../types/response";
 
 
 export const getDataMajelis = (filter: DataFilter): Promise<DataResponse> => {
@@ -15,7 +16,7 @@ export const getDataMajelis = (filter: DataFilter): Promise<DataResponse> => {
 
 
 
-export const createDataMajelis = (formData: DataInsert): Promise<any> => {
+export const createDataMajelis = (formData: DataInsert): Promise<ApiResponse<Boolean>> => {
   console.log("Submitting form data:", formData);
   return apiClient
     .post(`${DataMajelisAPI.createData}`, formData)

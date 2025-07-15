@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -17,10 +17,12 @@ import {
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import DoneIcon from "@mui/icons-material/Done";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { fetchApprovalByDate } from "../../../api/dataApproval";
+import { ReservationData } from "../../../store/formPeminjaman/type";
 
 export function DetailApproval() {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const dataDummyApprovalDetail = [
     {
       tanggalPemakaian: "12 April 2025",
@@ -62,20 +64,69 @@ export function DetailApproval() {
     },
   ];
 
-  const [dataBind, setDataBind] = useState({
-    data: dataDummyApprovalDetail,
-  });
+  const [dataBind, setDataBind] = useState<ReservationData[]>([]);
   const [dataBindPenunjang, setDataBindPenunjang] = useState({
     data: dataDummyPenunjang,
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { reservationDate, startTime, roomName } = location.state || {};
+  const [headers, setHeaders] = useState<string[]>([]); // State for dynamic headers
 
   const clickCancel = () => {
     navigate("/pinjam-ruangan/approval", { replace: true });
   };
 
+  const excludedHeaders = [
+    "transactionID",
+    "reservationDate",
+    "startTime",
+    "roomName",
+    "Peminjam",
+    "mjMengetahui",
+    "createdBy"
+  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      // setLoading(true);
+      try {
+        const formattedString = `${reservationDate};${startTime};${roomName}`;
+        const response = await fetchApprovalByDate(formattedString);
+        if (response.statusCode === 200) {
+          console.log(response.data[0])
+          const reservationData = response.data.reservationData;  // Array 1
+          const scoreData = response.data.scoreData;  // Array 2
+
+          console.log(reservationData);  // Log the first array
+          console.log(scoreData);  // Log the second array
+
+          setDataBind(response.data.reservationData);
+          if (reservationData.length > 0) {
+            const dynamicHeaders = Object.keys(reservationData[0]); // Extract keys dynamically from the first item
+            // Filter out the excluded headers
+            const filteredHeaders = dynamicHeaders.filter(header => !excludedHeaders.includes(header));
+            setHeaders(filteredHeaders);
+          }
+        } else {
+          // setError("Failed to fetch data");
+        }
+      } catch (err) {
+        // setError("Error fetching data");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    if (reservationDate && startTime && roomName) {
+      fetchData();
+    }
+  }, [reservationDate, startTime, roomName]);
+  useEffect(() => {
+    console.log(headers)
+  }, [dataBind])
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
-      <HeaderSection/>
+      <HeaderSection />
       <InputLabel
         sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
       >
@@ -122,46 +173,23 @@ export function DetailApproval() {
                 >
                   Ruangan
                 </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Jenis Kegiatan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Durasi
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Jumlah Orang
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Peminjaman
-                </TableCell>
+
+                {headers.map((header, index) => {
+                  return (
+                    <TableCell
+                      key={index}
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        color: "white",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {header.charAt(0).toUpperCase() + header.slice(1)} {/* Capitalize first letter */}
+                    </TableCell>
+                  );
+                })}
+               
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -195,8 +223,8 @@ export function DetailApproval() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {dataBind.data.length > 0 ? (
-                dataBind.data.map((ex: any, index) => (
+              {dataBind.length > 0 ? (
+                dataBind.map((ex: any, index) => (
                   <TableRow
                     key={ex.codePenatua}
                     sx={{
@@ -206,7 +234,7 @@ export function DetailApproval() {
                     }}
                   >
                     <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                      {ex.tanggalPemakaian}
+                      {ex.reservationDate}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -214,7 +242,7 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.jamPemakaian}
+                      {ex.startTime}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -222,39 +250,34 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.ruangan}
+                      {ex.roomName}
                     </TableCell>
+                    {headers.map((header, headerIndex) => {
+                      // Exclude the unwanted headers directly
+                      if (!excludedHeaders.includes(header)) {
+                        return (
+                          <TableCell
+                            key={headerIndex}
+                            sx={{
+                              ...layoutPrivateStyle.manageTableCell,
+                              textAlign: "center",
+                            }}
+                          >
+                            {/* Render the value dynamically using the header as the key */}
+                            {ex[header] ?? "N/A"} {/* If the value is undefined, show 'N/A' */}
+                          </TableCell>
+                        );
+                      }
+                      return null;
+                    })}
+
                     <TableCell
                       sx={{
                         ...layoutPrivateStyle.manageTableCell,
                         textAlign: "center",
                       }}
                     >
-                      {ex.jenisKegiatan}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.durasi}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.jumlahOrang}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.peminjaman}
+                      {ex.anggotaKomisi}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -270,7 +293,7 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.jemaatPeminjaman}
+                      {ex.createdBy}
                     </TableCell>
                     <TableCell
                       sx={{

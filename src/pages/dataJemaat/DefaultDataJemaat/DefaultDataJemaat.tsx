@@ -20,155 +20,19 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import logo from "../../../assets/logo.png";
-import { Data, DataFilter } from "../../../store/dataPeminjam/type";
+import { Data, DataFilter } from "../../../store/dataJemaat/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store";
+import { fetchDataJemaat } from "../../../api/dataJemaat";  // Adjust the import for your API
 
-export function DefaultDataPeminjam() {
+export function DefaultDataJemaat() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
-  const dataDummyPeminjam = [
-    {
-      codePenatua: "PNT001",
-      namaPenatua: "Wanda Primayansa",
-      jabatan: "Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "081234567890",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "MJ",
-    },
-    {
-      codePenatua: "PNT002",
-      namaPenatua: "Sinta Dewi",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "082345678901",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT003",
-      namaPenatua: "Budi Santoso",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "083456789012",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-  ];
-
-  const [dataBind, setDataBind] = useState({ data: dataDummyPeminjam });
+  const [dataBind, setDataBind] = useState<Data[]>([]);
+  const [filteredData, setFilteredData] = useState<Data[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -184,12 +48,12 @@ export function DefaultDataPeminjam() {
     setPage(0);
   };
 
-  const handleManagePeminjam = () => {
-    navigate("/manage-peminjam", { replace: true });
+  const handleManageJemaat = () => {
+    navigate("/manage-jemaat", { replace: true });
   };
 
   const clickEditData = (item: Data) => {
-    navigate("/manage-peminjam", {
+    navigate("/manage-jemaat", {
       state: {
         itemData: item,
         mode: "Edit",
@@ -204,11 +68,26 @@ export function DefaultDataPeminjam() {
   };
 
   useEffect(() => {
-    const filtered = dataBind.data.filter((item: any) =>
-      item.namaPenatua?.toLowerCase().includes(searchData.toLowerCase())
+    const loadData = async () => {
+      try {
+        const response = await fetchDataJemaat();
+        if (response.statusCode === 200) {
+          setDataBind(response.data);
+          setFilteredData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const filtered = dataBind.filter((item: Data) =>
+      item.fullName?.toLowerCase().includes(searchData.toLowerCase())
     );
     setFilteredData(filtered);
-  }, [searchData, dataBind.data]);
+  }, [searchData, dataBind]);
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -216,7 +95,7 @@ export function DefaultDataPeminjam() {
       <InputLabel
         sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
       >
-        Master Data Peminjam
+        Master Data Jemaat
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={2} alignItems={"center"}>
@@ -224,7 +103,7 @@ export function DefaultDataPeminjam() {
             <Button
               variant="contained"
               sx={layoutPrivateStyle.buttonAdd}
-              onClick={handleManagePeminjam}
+              onClick={handleManageJemaat}
             >
               Tambah Data
             </Button>
@@ -315,9 +194,9 @@ export function DefaultDataPeminjam() {
               {filteredData.length > 0 ? (
                 filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex: any, index) => (
+                  .map((ex: Data, index) => (
                     <TableRow
-                      key={ex.codePenatua}
+                      key={ex.userID}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -325,7 +204,7 @@ export function DefaultDataPeminjam() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.namaPenatua}
+                        {ex.fullName}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -333,7 +212,7 @@ export function DefaultDataPeminjam() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.noWhatsApp}
+                        {ex.phoneNo}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -341,7 +220,7 @@ export function DefaultDataPeminjam() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.alamatPenatua}
+                        {ex.address}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -405,7 +284,7 @@ export function DefaultDataPeminjam() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
+            count={filteredData.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
