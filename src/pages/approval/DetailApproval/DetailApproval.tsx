@@ -77,6 +77,15 @@ export function DetailApproval() {
     navigate("/pinjam-ruangan/approval", { replace: true });
   };
 
+  const excludedHeaders = [
+    "transactionID",
+    "reservationDate",
+    "startTime",
+    "roomName",
+    "Peminjam",
+    "mjMengetahui",
+    "createdBy"
+  ];
   useEffect(() => {
     const fetchData = async () => {
       // setLoading(true);
@@ -93,7 +102,10 @@ export function DetailApproval() {
 
           setDataBind(response.data.reservationData);
           if (reservationData.length > 0) {
-            setHeaders(Object.keys(reservationData[0])); // Extract keys dynamically from the first item
+            const dynamicHeaders = Object.keys(reservationData[0]); // Extract keys dynamically from the first item
+            // Filter out the excluded headers
+            const filteredHeaders = dynamicHeaders.filter(header => !excludedHeaders.includes(header));
+            setHeaders(filteredHeaders);
           }
         } else {
           // setError("Failed to fetch data");
@@ -161,25 +173,23 @@ export function DetailApproval() {
                 >
                   Ruangan
                 </TableCell>
+
                 {headers.map((header, index) => {
-                  // Start from index 4 and stop before mjMengetahui
-                  if (index >= 4 ) {
-                    return (
-                      <TableCell
-                        key={index}
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          color: "white",
-                          fontWeight: "bold",
-                          textAlign: "center",
-                        }}
-                      >
-                        {header.charAt(0).toUpperCase() + header.slice(1)} {/* Capitalize first letter */}
-                      </TableCell>
-                    );
-                  }
-                  return null;
+                  return (
+                    <TableCell
+                      key={index}
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        color: "white",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {header.charAt(0).toUpperCase() + header.slice(1)} {/* Capitalize first letter */}
+                    </TableCell>
+                  );
                 })}
+               
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -243,8 +253,8 @@ export function DetailApproval() {
                       {ex.roomName}
                     </TableCell>
                     {headers.map((header, headerIndex) => {
-                      // Start from index 4 and exclude 'mjMengetahui'
-                      if (headerIndex >= 4 && header !== "mjMengetahui") {
+                      // Exclude the unwanted headers directly
+                      if (!excludedHeaders.includes(header)) {
                         return (
                           <TableCell
                             key={headerIndex}
@@ -253,37 +263,14 @@ export function DetailApproval() {
                               textAlign: "center",
                             }}
                           >
-                            {/* Render the value dynamically using the header as key */}
+                            {/* Render the value dynamically using the header as the key */}
                             {ex[header] ?? "N/A"} {/* If the value is undefined, show 'N/A' */}
                           </TableCell>
                         );
                       }
                       return null;
                     })}
-                    {/* <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.JenisKegiatan}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.Durasi}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.Rutin}
-                    </TableCell> */}
+
                     <TableCell
                       sx={{
                         ...layoutPrivateStyle.manageTableCell,
