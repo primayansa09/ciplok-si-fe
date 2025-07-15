@@ -1,0 +1,1 @@
+export {ManageKriteriadanSubKriteria} from './ManageKriteriadanSubKriteria';

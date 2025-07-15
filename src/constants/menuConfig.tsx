@@ -45,6 +45,12 @@ export const sidebarMenu: ListItem[] = [
         link: "/master-data/data-ruangan",
         key: "Data Ruangan",
       },
+      {
+        name: "Data Kriteria dan Sub Kriteria",
+        icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
+        link: "/kriteria-sub-kriteria",
+        key: "Data Kriteria dan Sub Kriteria",
+      },
     ],
   },
   {

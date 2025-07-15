@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Divider,
   Grid,
   Stack,
   TextField,
@@ -19,44 +20,83 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import { DataMajelis } from "../../../store/dataMajelis/type";
+import logo from "../../../assets/logo.png";
+import { Data, DataFilter } from "../../../store/dataPeminjam/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../store";
-// import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
 
-export function DefaultDataMajelis() {
+export function DefaultKriteriadanSubKriteria() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const { data, loading, error, pageNumber, pageSize, totalPages, totalData } = useSelector(
-    (state: RootState) => state.dataMajelis
-  );
-
   const [open, setOpen] = useState(false);
+
+  const dataDummyPeminjam = [
+    {
+      codePenatua: "PNT001",
+      namaPenatua: "Wanda Primayansa",
+      jabatan: "Ketua",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "081234567890",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "MJ",
+    },
+    {
+      codePenatua: "PNT002",
+      namaPenatua: "Sinta Dewi",
+      jabatan: "Wakil Ketua",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "082345678901",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "Komisi Pemuda",
+    },
+    {
+      codePenatua: "PNT003",
+      namaPenatua: "Budi Santoso",
+      jabatan: "Wakil Ketua",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "083456789012",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "Komisi Pemuda",
+    },
+    {
+      codePenatua: "PNT004",
+      namaPenatua: "Rina Marlina",
+      jabatan: "Bendahara",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "084567890123",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "Panitia",
+    },
+    {
+      codePenatua: "PNT004",
+      namaPenatua: "Rina Marlina",
+      jabatan: "Bendahara",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "084567890123",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "Panitia",
+    },
+    {
+      codePenatua: "PNT004",
+      namaPenatua: "Rina Marlina",
+      jabatan: "Bendahara",
+      alamatPenatua: "Jakarta",
+      noWhatsApp: "084567890123",
+      periodeAwal: "01 Jan 2023",
+      periodeAkhir: "31 Des 2025",
+      anggotaKomisi: "Panitia",
+    },
+  ];
+
+  const [dataBind, setDataBind] = useState({ data: dataDummyPeminjam });
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<DataMajelis[]>([]);
-  const [page, setPage] = useState(pageNumber - 1);
-  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
-
-  // useEffect(() => {
-  //   dispatch(
-  //     fetchDataMajelis({
-  //       pageNumber: page + 1,
-  //       pageSize: rowsPerPage,
-  //       searchTerm: searchData,
-  //     })
-  //   );
-  // }, [dispatch, page, rowsPerPage, searchData]);
-
-  useEffect(() => {
-    if (data) {
-      const filtered = data.filter((item) =>
-        item.codePnt?.toLowerCase().includes(searchData.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }
-  }, [data, searchData]);
+  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -72,14 +112,12 @@ export function DefaultDataMajelis() {
     setPage(0);
   };
 
-  const handleManageMajalis = () => {
-    navigate("/manage-majelis", { replace: true });
+  const handleManageKriteria = () => {
+    navigate("/kriteria-sub-kriteria/manage-data", { replace: true });
   };
 
-  const clickEditData = (item: DataMajelis) => {
-
-    console.log(item)
-    navigate("/manage-majelis", {
+  const clickEditData = (item: Data) => {
+    navigate("/kriteria-sub-kriteria/manage-data", {
       state: {
         itemData: item,
         mode: "Edit",
@@ -93,8 +131,12 @@ export function DefaultDataMajelis() {
     setOpen(false);
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  useEffect(() => {
+    const filtered = dataBind.data.filter((item: any) =>
+      item.namaPenatua?.toLowerCase().includes(searchData.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [searchData, dataBind.data]);
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -102,7 +144,7 @@ export function DefaultDataMajelis() {
       <InputLabel
         sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
       >
-        Master Data Majelis
+        Master Data Kriteria dan Sub Kriteria
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={2} alignItems={"center"}>
@@ -110,7 +152,7 @@ export function DefaultDataMajelis() {
             <Button
               variant="contained"
               sx={layoutPrivateStyle.buttonAdd}
-              onClick={handleManageMajalis}
+              onClick={handleManageKriteria}
             >
               Tambah Data
             </Button>
@@ -129,10 +171,11 @@ export function DefaultDataMajelis() {
           <Grid size={2}>
             <TextField
               id="standard-basic"
+              label=""
               variant="standard"
-              fullWidth
               value={searchData}
               onChange={(e) => setSearchData(e.target.value)}
+              fullWidth
               sx={{ marginBottom: "15px" }}
             />
           </Grid>
@@ -144,36 +187,65 @@ export function DefaultDataMajelis() {
           <Table sx={{ minWidth: 720 }} size="small" aria-label="a dense table">
             <TableHead sx={layoutPrivateStyle.moduleTableHead}>
               <TableRow sx={layoutPrivateStyle.manageTableRow}>
-                {[
-                  "Code Penatua",
-                  "Nama Penatua",
-                  "Jabatan",
-                  "No WhatsApp",
-                  "Awal Periode",
-                  "Akhir Periode",
-                  "Aksi",
-                ].map((label) => (
-                  <TableCell
-                    key={label}
-                    sx={{
-                      ...layoutPrivateStyle.manageTableCell,
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    {label}
-                  </TableCell>
-                ))}
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Kode Kriteria
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Nama Kriteria
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Bobot
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Sub Kriteria
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Aksi
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
               {filteredData.length > 0 ? (
                 filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex) => (
+                  .map((ex: any, index) => (
                     <TableRow
-                      key={ex.codePnt}
+                      key={ex.codePenatua}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -181,7 +253,7 @@ export function DefaultDataMajelis() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.codePnt}
+                        {ex.namaPenatua}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -189,7 +261,7 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.fullName}
+                        {ex.noWhatsApp}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -197,7 +269,7 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.jabatanPenatua}
+                        {ex.alamatPenatua}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -205,27 +277,7 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.phoneNo}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.startDate
-                          ? format(new Date(ex.startDate), "dd-MMMM-yyyy")
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.endDate
-                          ? format(new Date(ex.endDate), "dd-MMMM-yyyy")
-                          : "N/A"}
+                        {ex.anggotaKomisi}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -271,6 +323,7 @@ export function DefaultDataMajelis() {
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
                   <TableCell colSpan={8} align="center">
                     No Data Available.
+                    <div>Please Click Search Button</div>
                   </TableCell>
                 </TableRow>
               )}
@@ -280,12 +333,12 @@ export function DefaultDataMajelis() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={totalData}
+            count={dataBind.data.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[10, 25, 50]}
+            rowsPerPageOptions={[5, 10, 25, 50]}
             labelRowsPerPage="Showing"
           />
         </Box>
