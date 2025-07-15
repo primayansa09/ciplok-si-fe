@@ -22,10 +22,13 @@ export type DataFilter = {
 };
 
 export type Data = {
-    id: string;
-    namaKegiatan: string | null;
-    deskripsiKegiatan: string | null;
-    scoreKegiatan: string | null;
+    transactionID: number;
+    status: string | null;
+    roomName: string | null;
+    reservationDate: string | null;
+    description:string;
+    mjRequest:string;
+    createdBy:string;
 };
 
 export type DataInsert = {

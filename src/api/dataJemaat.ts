@@ -26,14 +26,12 @@ export const fetchNamaPenatua = async (query: string) => {
 export const fetchDataJemaat = async (): Promise<ApiResponse<Data[]>> => {
   try {
     const response = await apiClient.post<ApiResponse<Data[]>>(ApiJemaat.getData);
-
-    // Check if the response status is successful
     if (response.data.statusCode === 200) {
-      return response.data; // Return the response data (your data from backend)
+      return response.data; 
     } else {
       console.error(`Error: ${response.data.message}`);
       return {
-        status: "error", // or whatever status you need
+        status: "error",
         statusCode: response.data.statusCode,
         message: response.data.message || "Something went wrong",
         data: [],
