@@ -28,3 +28,17 @@ export const createDataMajelis = (formData: DataInsert): Promise<any> => {
       throw error;
     });
 };
+
+export const updateDataMajelis = (majelisID: number, formData: DataInsert): Promise<any> => {
+  console.log("Edit Majelis form data:", formData);
+  return apiClient
+    .post(`${DataMajelisAPI.updateData}/${majelisID}`, formData)
+    .then((response) => {
+      const responseData = response.data;
+      return responseData;
+    })
+    .catch((error) => {
+      console.error("Error updating data:", error);
+      throw error;
+    });
+};

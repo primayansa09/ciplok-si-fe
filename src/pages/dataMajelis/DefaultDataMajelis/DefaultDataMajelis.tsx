@@ -25,7 +25,7 @@ import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
 import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
-import { format } from 'date-fns'; // Import format from date-fns
+import { format } from 'date-fns'; 
 
 
 export function DefaultDataMajelis() {
@@ -54,7 +54,7 @@ export function DefaultDataMajelis() {
   useEffect(() => {
     if (data) {
       const filtered = data.filter((item) =>
-        item.codePenatua?.toLowerCase().includes(searchData.toLowerCase())
+        item.codePnt?.toLowerCase().includes(searchData.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -79,6 +79,8 @@ export function DefaultDataMajelis() {
   };
 
   const clickEditData = (item: DataMajelis) => {
+
+    console.log(item)
     navigate("/manage-majelis", {
       state: {
         itemData: item,
@@ -173,7 +175,7 @@ export function DefaultDataMajelis() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((ex) => (
                     <TableRow
-                      key={ex.codePenatua}
+                      key={ex.codePnt}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -181,7 +183,7 @@ export function DefaultDataMajelis() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.codePenatua}
+                        {ex.codePnt}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -189,7 +191,7 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.namaPenatua}
+                        {ex.fullName}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -205,7 +207,7 @@ export function DefaultDataMajelis() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.phoneNumber}
+                        {ex.phoneNo}
                       </TableCell>
                       <TableCell
                         sx={{

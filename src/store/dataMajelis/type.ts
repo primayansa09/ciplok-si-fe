@@ -6,7 +6,7 @@ export type DataResponse = {
     result?: boolean;
     message?: string;
     data: {
-        data: Data[]; // Update this line to match the structure of your API response
+        data: Data[];
         totalData: number;
     };
 };
@@ -33,12 +33,13 @@ export type Data = {
 };
 
 export type DataInsert = {
-    id: string;
+    userID: string;
+    majelisID: string;
     codePnt: string | null;
     fullName: string | null;
     jabatanPenatua: string | null;
     alamatPenatua: string | null;
-    noWhatsapp: string | null;
+    phoneNo: string | null;
     startDate: Date;
     endDate: Date;
 };
@@ -50,19 +51,23 @@ export type ValidateError = {
 
 
 export interface DataMajelis {
-  codePenatua: string;
-  namaPenatua: string;
-  jabatanPenatua: string;
-  phoneNumber: string;
-  startDate: Date;
-  endDate: Date;
+    userID:string;
+    majelisID:string;
+    codePnt: string;
+    fullName: string;
+    jabatanPenatua: string;
+    phoneNo: string;
+    alamatPenatua: string;
+    startDate: Date;
+    endDate: Date;
 }
 
 
 export interface DataUserMajelis {
-  fullName: string;
-  address: string;
-  phoneNo:string;
+    fullName: string;
+    address: string;
+    phoneNo: string;
+    userID: string;
 }
 
 

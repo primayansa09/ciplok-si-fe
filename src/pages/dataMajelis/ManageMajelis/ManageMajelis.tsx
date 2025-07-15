@@ -10,24 +10,25 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { fetchJabatanPenatua } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
-import { createDataMajelis } from "../../../api/dataMajelis";
+import { createDataMajelis, updateDataMajelis } from "../../../api/dataMajelis";
 
 export function ManageMajelis() {
   const [awalPeriode, setAwalPeriode] = useState<Dayjs | null>(null);
   const [akhirPeriode, setAkhirPeriode] = useState<Dayjs | null>(null);
   const [formDataMajelis, setFormDataMajelis] = useState<DataInsert>({
-    id: "",
+    majelisID: "",
+    userID: "",
     codePnt: "",
     fullName: "",
     jabatanPenatua: "",
     alamatPenatua: "",
-    noWhatsapp: "",
+    phoneNo: "",
     startDate: new Date(),
     endDate: new Date(),
   });
   const [errors, setErrors] = useState({
     namaPenatua: false,
-    noWhatsapp: false,
+    phoneNo: false,
   });
   const [searchResults, setSearchResults] = useState<DataUserMajelis[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,14 +38,16 @@ export function ManageMajelis() {
   const { itemData, mode, IsEdit } = location.state || {};
 
   useEffect(() => {
+    console.log(itemData)
     if (IsEdit && itemData) {
       setFormDataMajelis(itemData);
     }
-    if (IsEdit && itemData?.periodeAwal) {
-      setAwalPeriode(dayjs(itemData.periodeAwal, "DD MMM YYYY"));
+    if (IsEdit && itemData?.startDate) {
+      setAwalPeriode(dayjs(itemData.startDate));
     }
-    if (IsEdit && itemData?.periodeAkhir) {
-      setAkhirPeriode(dayjs(itemData.periodeAkhir, "DD MMM YYYY"));
+
+    if (IsEdit && itemData?.endDate) {
+      setAkhirPeriode(dayjs(itemData.endDate));
     }
     const fetchJabatan = async () => {
       const jabatanData = await fetchJabatanPenatua();
@@ -57,7 +60,7 @@ export function ManageMajelis() {
   const handleSubmit = async () => {
     const newErrors = {
       namaPenatua: formDataMajelis.fullName?.trim() === "" || formDataMajelis.fullName === null,
-      noWhatsapp: formDataMajelis.noWhatsapp?.trim() === "" || formDataMajelis.noWhatsapp === null,
+      phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
     };
 
     setErrors(newErrors);
@@ -68,21 +71,41 @@ export function ManageMajelis() {
       return;
     }
     try {
-     const response = await createDataMajelis(formDataMajelis);
-      if (response.status === 200) {
-        console.log("Data submitted successfully:", response.data);
-        setFormDataMajelis({
-          id: "",
-          codePnt: "",
-          fullName: "",
-          jabatanPenatua: "",
-          alamatPenatua: "",
-          noWhatsapp: "",
-          startDate: new Date(),
-          endDate: new Date(),
-        });
+      if (!IsEdit) {
+        const response = await createDataMajelis(formDataMajelis);
+        if (response.status === 200) {
+          console.log("Data submitted successfully:", response.data);
+          setFormDataMajelis({
+            majelisID: "",
+            userID: "",
+            codePnt: "",
+            fullName: "",
+            jabatanPenatua: "",
+            alamatPenatua: "",
+            phoneNo: "",
+            startDate: new Date(),
+            endDate: new Date(),
+          });
+
+        }
+        navigate("/master-data/data-majelis", { replace: true });
       } else {
-        console.error("Error submitting data:", response.data);
+          console.log('3213123')
+        const response = await updateDataMajelis(itemData.majelisID, formDataMajelis);
+        console.log(response.message)
+        if (response.status === 200) {
+          setFormDataMajelis({
+            majelisID: "",
+            userID: "",
+            codePnt: "",
+            fullName: "",
+            jabatanPenatua: "",
+            alamatPenatua: "",
+            phoneNo: "",
+            startDate: new Date(),
+            endDate: new Date(),
+          });
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -91,10 +114,22 @@ export function ManageMajelis() {
 
   const handleAwalPeriodeChange = (value: Dayjs | null) => {
     setAwalPeriode(value);
+    if (value) {
+      setFormDataMajelis({
+        ...formDataMajelis,
+        startDate: value.toDate(),
+      });
+    }
   };
 
   const handleAkhirPeriodeChange = (newValue: Dayjs | null) => {
     setAkhirPeriode(newValue);
+    if (newValue) {
+      setFormDataMajelis({
+        ...formDataMajelis,
+        endDate: newValue.toDate(),
+      });
+    }
   };
 
   const clickCancel = () => {
@@ -109,7 +144,7 @@ export function ManageMajelis() {
     });
     setErrors({
       namaPenatua: query.trim() === "",
-      noWhatsapp: formDataMajelis.noWhatsapp?.trim() === "" || formDataMajelis.noWhatsapp === null,
+      phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
     });
 
     if (query.trim() === "") {
@@ -132,7 +167,8 @@ export function ManageMajelis() {
       ...formDataMajelis,
       fullName: result.fullName,
       alamatPenatua: result.address,
-      noWhatsapp: result.phoneNo,
+      phoneNo: result.phoneNo,
+      userID: result.userID
     });
     setSearchResults([]);
   };
@@ -198,6 +234,23 @@ export function ManageMajelis() {
               error={errors.namaPenatua}
               helperText={errors.namaPenatua ? "Nama Penatua wajib diisi" : ""}
               label="Nama Penatua"
+              disabled={IsEdit}
+            />
+
+            <TextField
+              id="outlined-basic"
+              variant="outlined"
+              sx={{ width: "250px", display: "none" }}
+              size="small"
+              value={formDataMajelis.userID}
+              onChange={(e) =>
+                setFormDataMajelis({
+                  ...formDataMajelis,
+                  userID: e.target.value,
+                })
+              }
+              hidden
+
             />
             {loading && <CircularProgress size={24} />}
             {searchResults.length > 0 && (
@@ -306,15 +359,14 @@ export function ManageMajelis() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataMajelis.noWhatsapp}
+              value={formDataMajelis.phoneNo}
               onChange={(e) =>
                 setFormDataMajelis({
                   ...formDataMajelis,
-                  noWhatsapp: e.target.value,
+                  phoneNo: e.target.value,
                 })
               }
-              error={errors.noWhatsapp}
-              helperText={errors.noWhatsapp ? "No WhatsApp Wajib diisi" : ""}
+              error={errors.phoneNo}
               disabled
             />
           </Grid>

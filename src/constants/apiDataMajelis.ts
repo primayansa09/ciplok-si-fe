@@ -4,5 +4,5 @@ export const DataMajelisAPI = {
   getData: `${BASE_URL}/maintainUser/getDataMajelis`,
   getDataMajelis: `${BASE_URL}/maintainUser/getAllDataUser`,
   createData: `${BASE_URL}/maintainUser/addNewMajelis`,
-  deleteData: `${BASE_URL}/Majelis/delete`,
+  updateData: `${BASE_URL}/maintainUser/updateDataMajelis`,
 };
