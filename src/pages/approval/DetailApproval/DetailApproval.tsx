@@ -18,7 +18,7 @@ import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import DoneIcon from "@mui/icons-material/Done";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchApprovalByDate } from "../../../api/dataApproval";
-import { ReservationData } from "../../../store/formPeminjaman/type";
+import { ReservationData, ScoreData } from "../../../store/formPeminjaman/type";
 
 export function DetailApproval() {
   const navigate = useNavigate();
@@ -65,13 +65,12 @@ export function DetailApproval() {
   ];
 
   const [dataBind, setDataBind] = useState<ReservationData[]>([]);
-  const [dataBindPenunjang, setDataBindPenunjang] = useState({
-    data: dataDummyPenunjang,
-  });
+  const [dataBindPenunjang, setDataBindPenunjang] = useState<ScoreData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { reservationDate, startTime, roomName } = location.state || {};
   const [headers, setHeaders] = useState<string[]>([]); // State for dynamic headers
+  const [headersScore, setHeadersScore] = useState<string[]>([]); // State for dynamic headers
 
   const clickCancel = () => {
     navigate("/pinjam-ruangan/approval", { replace: true });
@@ -82,9 +81,15 @@ export function DetailApproval() {
     "reservationDate",
     "startTime",
     "roomName",
-    "Peminjam",
     "mjMengetahui",
     "createdBy"
+  ];
+  const excludedHeadersScore = [
+    "transactionID",
+    "tanggalPengajuan",
+    "recommendationStatus",
+    "finalScore",
+
   ];
   useEffect(() => {
     const fetchData = async () => {
@@ -101,11 +106,17 @@ export function DetailApproval() {
           console.log(scoreData);  // Log the second array
 
           setDataBind(response.data.reservationData);
+          setDataBindPenunjang(scoreData);
           if (reservationData.length > 0) {
             const dynamicHeaders = Object.keys(reservationData[0]); // Extract keys dynamically from the first item
             // Filter out the excluded headers
             const filteredHeaders = dynamicHeaders.filter(header => !excludedHeaders.includes(header));
             setHeaders(filteredHeaders);
+          }
+          if (reservationData.length > 0) {
+            const dynamicHeadersScore = Object.keys(scoreData[0]);
+            const filteredHeaders = dynamicHeadersScore.filter(header => !excludedHeadersScore.includes(header));
+            setHeadersScore(filteredHeaders)
           }
         } else {
           // setError("Failed to fetch data");
@@ -123,6 +134,7 @@ export function DetailApproval() {
   }, [reservationDate, startTime, roomName]);
   useEffect(() => {
     console.log(headers)
+    console.log(headersScore)
   }, [dataBind])
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -189,7 +201,16 @@ export function DetailApproval() {
                     </TableCell>
                   );
                 })}
-               
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  MJ Mengatahui
+                </TableCell>
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -253,7 +274,6 @@ export function DetailApproval() {
                       {ex.roomName}
                     </TableCell>
                     {headers.map((header, headerIndex) => {
-                      // Exclude the unwanted headers directly
                       if (!excludedHeaders.includes(header)) {
                         return (
                           <TableCell
@@ -277,7 +297,7 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.anggotaKomisi}
+                      {ex.AnggotaKomisi}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -360,6 +380,26 @@ export function DetailApproval() {
                 >
                   Tanggal
                 </TableCell>
+                {headersScore.map((header, headerIndex) => {
+                  if (!excludedHeaders.includes(header)) {
+                    return (
+                      <TableCell
+                        key={headerIndex}
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                          color: "white",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {header.charAt(0).toUpperCase() + header.slice(1)} {/* Capitalize first letter */}
+                      </TableCell>
+                    );
+                  }
+                  return null;
+                })}
+
+
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -368,8 +408,9 @@ export function DetailApproval() {
                     textAlign: "center",
                   }}
                 >
-                  Jam
+                  Final Score
                 </TableCell>
+
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -378,83 +419,13 @@ export function DetailApproval() {
                     textAlign: "center",
                   }}
                 >
-                  Ruangan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Jenis Kegiatan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Peminjam
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Durasi
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Status Rutin
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Tanggal Pengajuan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Score
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Status
+                  Recommendation Status
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {dataBindPenunjang.data.length > 0 ? (
-                dataBindPenunjang.data.map((ex: any, index) => (
+              {dataBindPenunjang.length > 0 ? (
+                dataBindPenunjang.map((ex: any, index) => (
                   <TableRow
                     key={ex.codePenatua}
                     sx={{
@@ -463,73 +434,31 @@ export function DetailApproval() {
                       },
                     }}
                   >
-                    <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                      {ex.tanggalPemakaian}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.jamPemakaian}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.ruangan}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.jenisKegiatan}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.peminjam}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.durasi}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.statusRutin}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
+                    <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
                       {ex.tanggalPengajuan}
                     </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
-                      {ex.score}
+
+                    {headersScore.map((header, headerIndex) => {
+                      if (!excludedHeadersScore.includes(header)) {
+                        return (
+                          <TableCell
+                            key={headerIndex}
+                            sx={{
+                              ...layoutPrivateStyle.manageTableCell,
+                              textAlign: "center",
+                            }}
+                          >
+                            {ex[header] ?? 0}
+                          </TableCell>
+                        );
+                      }
+                      return null;
+                    })}
+                    <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                      {ex.finalScore}
                     </TableCell>
+
+
                     <TableCell
                       sx={{
                         ...layoutPrivateStyle.manageTableCell,
@@ -542,7 +471,7 @@ export function DetailApproval() {
                         justifyContent="center"
                         gap={1}
                       >
-                        {ex.status === "Cancel" ? (
+                        {ex.recommendationStatus === "Reject" ? (
                           <Button
                             sx={{
                               cursor: "pointer",
@@ -558,7 +487,7 @@ export function DetailApproval() {
                               Cancel
                             </InputLabel>
                           </Button>
-                        ) : ex.status === "Approve" ? (
+                        ) : ex.recommendationStatus === "Approve" ? (
                           <Button
                             sx={{
                               cursor: "pointer",
@@ -575,7 +504,7 @@ export function DetailApproval() {
                             </InputLabel>
                           </Button>
                         ) : (
-                          "-"
+                           "N/A"
                         )}
                       </Box>
                     </TableCell>

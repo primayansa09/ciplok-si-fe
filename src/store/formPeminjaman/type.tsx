@@ -56,6 +56,16 @@ export type ReservationData = {
 
 };
 
+
+export type ScoreData = {
+    transactionID: number;
+    tanggalPengajuan:string;
+    recommendationStatus:string;
+    finalScore:string;
+
+};
+
+
 export type ValidateError = {
     codePenatua: boolean;
     namaPenatua: boolean;
