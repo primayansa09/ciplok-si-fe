@@ -1,5 +1,5 @@
 import { ManageMajelis } from "../pages/dataMajelis/ManageMajelis";
-import {ManagePeminjam} from "../pages/dataPeminjam/ManageDataPeminjam";
+import {ManageJemaat} from "../pages/dataJemaat/ManageDataJemaat";
 import { ManageKegiatan } from "../pages/dataKegiatan/ManageDataKegiatan";
 import { ManageRuangan } from "../pages/dataRuangan/ManageRuangan";
 import { ManagePeminjamanRuangan } from "../pages/formPeminjaman/ManagePeminjamanRuangan";
@@ -21,7 +21,7 @@ export const protectedRoutes: Route[] = [
     key: "manage-peminjam",
     title: "Peminjam",
     description: "Peminjam",
-    component: ManagePeminjam,
+    component: ManageJemaat,
     path: "/manage-majelis",
     isEnabled: true,
     appendDivider: true,

@@ -40,11 +40,8 @@ export const fetchDataMajelis = createAsyncThunk(
         pageSize: pageSize.toString(),
         ...(searchTerm ? { search: searchTerm } : {}),
       }).toString();
-
       const url = `${DataMajelisAPI.getData}?${query}`;
       const response = await apiClient.post<ApiResponse<DataMajelis[]>>(url);
-
-      // Return response data beserta pagination info
       return {
         data: response.data.data,
         pageNumber: response.data.pageNumber,

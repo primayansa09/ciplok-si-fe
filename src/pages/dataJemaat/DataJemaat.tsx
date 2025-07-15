@@ -1,10 +1,10 @@
 import Container from "@mui/material/Container";
-import { DefaultDataPeminjam } from "./DefaultDataPeminjam";
+import { DefaultDataJemaat } from "./DefaultDataJemaat";
 
-export function DataPeminjam (){
+export function DataJemaat (){
     return(
         <Container maxWidth={false} disableGutters>
-            <DefaultDataPeminjam/>            
+            <DefaultDataJemaat/>            
         </Container>
     )
 }

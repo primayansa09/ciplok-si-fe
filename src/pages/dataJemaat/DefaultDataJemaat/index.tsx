@@ -1,0 +1,1 @@
+export {DefaultDataJemaat} from './DefaultDataJemaat'

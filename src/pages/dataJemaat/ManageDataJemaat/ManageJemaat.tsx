@@ -11,24 +11,23 @@ import {
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { DataInsert } from "../../../store/dataJemaat/type";
 
-export function ManagePeminjam() {
+export function ManageJemaat() {
   const navigate = useNavigate();
 
   const location = useLocation();
   const { itemData, mode, IsEdit } = location.state || {};
 
-  const [formDataPeminjam, setFormDataPeminjam] = useState({
-    codePenatua: "",
-    namaPenatua: "",
-    jabatan: "",
-    alamatPenatua: "",
-    noTelepon: "",
-    noWhatsapp: "",
-    periodeAwal: "",
-    periodeAkhir: "",
-    anggotaKomisi: "",
-    noTeleponLainnya: "",
+  const [formDataJemaat, setFormDataJemaat] = useState<DataInsert>({
+    userID: "",
+    email: "",
+    anggotaKomisi:"",
+    password:"",
+    phoneNo: "",
+    fullName: "",
+    address: "",
+    alternatePhoneNo: ""
   });
 
   const [errors, setErrors] = useState({
@@ -39,25 +38,25 @@ export function ManagePeminjam() {
   });
 
   const handleSubmit = () => {
-    const newErrors = {
-      namaPenatua: formDataPeminjam.namaPenatua.trim() === "",
-      alamatPenatua: formDataPeminjam.alamatPenatua.trim() === "",
-      noTelepon: formDataPeminjam.noTelepon.trim() === "",
-      noWhatsApp: formDataPeminjam.noWhatsapp.trim() === "",
-    };
+    // const newErrors = {
+    //   namaPenatua: formDataJemaat.namaPenatua.trim() === "",
+    //   alamatPenatua: formDataJemaat.alamatPenatua.trim() === "",
+    //   noTelepon: formDataJemaat.noTelepon.trim() === "",
+    //   noWhatsApp: formDataJemaat.noWhatsapp.trim() === "",
+    // };
 
-    setErrors(newErrors);
+    // setErrors(newErrors);
 
-    const isValid = !Object.values(newErrors).includes(true);
+    // const isValid = !Object.values(newErrors).includes(true);
 
-    if (!isValid) {
-      return;
-    }
+    // if (!isValid) {
+    //   return;
+    // }
   };
 
   useEffect(() => {
     if (IsEdit && itemData) {
-      setFormDataPeminjam(itemData);
+      setFormDataJemaat(itemData);
     }
   }, [IsEdit, itemData]);
 
@@ -91,11 +90,11 @@ export function ManagePeminjam() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataPeminjam.namaPenatua}
+              value={formDataJemaat.fullName}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
-                  namaPenatua: e.target.value,
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  fullName: e.target.value,
                 })
               }
               error={errors.namaPenatua}
@@ -111,7 +110,7 @@ export function ManagePeminjam() {
                 marginLeft: "15px",
               }}
             >
-              No Telepon <span style={{ color: "red" }}>*</span>
+              Email <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
           <Grid size={4}>
@@ -120,15 +119,44 @@ export function ManagePeminjam() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataPeminjam.noTelepon}
+              value={formDataJemaat.email}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
-                  noTelepon: e.target.value,
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  email: e.target.value,
                 })
               }
               error={errors.noTelepon}
               helperText={errors.noTelepon ? "No Telepon Wajib diidi" : ""}
+            />
+          </Grid>
+        </Grid>
+         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
+          <Grid size={2.2}>
+            <InputLabel
+              sx={{
+                ...layoutPrivateStyle.manageSubTitle,
+                marginLeft: "15px",
+              }}
+            >
+              Password <span style={{ color: "red" }}>*</span>
+            </InputLabel>
+          </Grid>
+          <Grid size={4}>
+            <TextField
+              id="outlined-basic"
+              variant="outlined"
+              sx={{ width: "250px" }}
+              size="small"
+              value={formDataJemaat.password}
+              onChange={(e) =>
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  password: e.target.value,
+                })
+              }
+              // error={errors.noTelepon}
+              // helperText={errors.noTelepon ? "No Telepon Wajib diidi" : ""}
             />
           </Grid>
         </Grid>
@@ -149,11 +177,40 @@ export function ManagePeminjam() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataPeminjam.noWhatsapp}
+              value={formDataJemaat.alternatePhoneNo}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
-                  noWhatsapp: e.target.value,
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  alternatePhoneNo: e.target.value,
+                })
+              }
+              error={errors.noWhatsApp}
+              helperText={errors.noWhatsApp ? "No WhatsApp Wajib diidi" : ""}
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2} alignItems={"center"} marginTop={2}>
+          <Grid size={2.2}>
+            <InputLabel
+              sx={{
+                ...layoutPrivateStyle.manageSubTitle,
+                marginLeft: "15px",
+              }}
+            >
+              No WhatsApp <span style={{ color: "red" }}>*</span>
+            </InputLabel>
+          </Grid>
+          <Grid size={4}>
+            <TextField
+              id="outlined-basic"
+              variant="outlined"
+              sx={{ width: "250px" }}
+              size="small"
+              value={formDataJemaat.password}
+              onChange={(e) =>
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  password: e.target.value,
                 })
               }
               error={errors.noWhatsApp}
@@ -186,11 +243,11 @@ export function ManagePeminjam() {
                   alignItems: "flex-start",
                 },
               }}
-              value={formDataPeminjam.alamatPenatua}
+              value={formDataJemaat.address}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
-                  alamatPenatua: e.target.value,
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  address: e.target.value,
                 })
               }
               error={errors.alamatPenatua}
@@ -215,10 +272,10 @@ export function ManagePeminjam() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataPeminjam.anggotaKomisi}
+              value={formDataJemaat.anggotaKomisi}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
+                setFormDataJemaat({
+                  ...formDataJemaat,
                   anggotaKomisi: e.target.value,
                 })
               }
@@ -243,11 +300,11 @@ export function ManagePeminjam() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
-              value={formDataPeminjam.noTeleponLainnya}
+              value={formDataJemaat.alternatePhoneNo}
               onChange={(e) =>
-                setFormDataPeminjam({
-                  ...formDataPeminjam,
-                  noTeleponLainnya: e.target.value,
+                setFormDataJemaat({
+                  ...formDataJemaat,
+                  alternatePhoneNo: e.target.value,
                 })
               }
               disabled

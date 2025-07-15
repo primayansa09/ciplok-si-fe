@@ -21,13 +21,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import logo from "../../../assets/logo.png";
-import { Data, DataFilter } from "../../../store/dataPeminjam/type";
+import { Data, DataFilter } from "../../../store/dataJemaat/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store";
 
-export function DefaultDataPeminjam() {
+export function DefaultDataJemaat() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
