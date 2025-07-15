@@ -22,8 +22,6 @@ import { PeminjamanRuangan } from "./pages/formPeminjaman/PeminjamanRuangan";
 import { Approval } from "./pages/approval/Approval";
 import { ManageMajelis } from "./pages/dataMajelis/ManageMajelis";
 import { ManageJemaat } from "./pages/dataJemaat/ManageDataJemaat";
-import { ManageKegiatan } from "./pages/dataKegiatan/ManageDataKegiatan";
-import { ManageRuangan } from "./pages/dataRuangan/ManageRuangan";
 import { ManagePeminjamanRuangan } from "./pages/formPeminjaman/ManagePeminjamanRuangan";
 import { DetailApproval } from "./pages/approval/DetailApproval";
 import { RequireAuth } from "./routes/RequireAuth";
@@ -55,7 +53,8 @@ function App() {
               <Route path="/master-data/data-ruangan" element={<DataRuangan />} />
               <Route path="/pinjam-ruangan/approval" element={<Approval />} />
               <Route path="/manage-majelis" element={<ManageMajelis />} />
-              <Route path="/manage-peminjam" element={<ManageJemaat />} />
+              <Route path="/manage-jemaat" element={<ManageJemaat />} />
+              <Route path="/pinjam-ruangan/form-peminjaman" element={<PeminjamanRuangan />} />
               <Route path="/manage-peminjaman-ruangan" element={<ManagePeminjamanRuangan />} />
               <Route path="/detail-approval" element={<DetailApproval />} />
               <Route path="/kriteria-sub-kriteria" element={<KriteriadanSubKriteria />} />

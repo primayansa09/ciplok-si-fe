@@ -53,7 +53,7 @@ export function ManageMajelis() {
       setAkhirPeriode(dayjs(itemData.endDate));
     }
     const fetchJabatan = async () => {
-      const jabatanData = await fetchJabatanPenatua();
+      const jabatanData = await fetchJabatanPenatua("JCODE");
       setJabatanPenatuaList(jabatanData);
     };
 
@@ -108,12 +108,12 @@ export function ManageMajelis() {
 
           setModalMessage(response.message || "Data updated successfully!");
           setRedirectTo("/master-data/data-majelis");
-          setOpenModal(true); // Ensure this triggers the modal visibility
+          setOpenModal(true);
         }
       }
     } catch (error) {
       setModalMessage("An error occurred while submitting the form.");
-      setOpenModal(true); // Ensure this triggers the modal visibility
+      setOpenModal(true);
     }
   };
 

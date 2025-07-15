@@ -62,7 +62,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
           >
             OK
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             onClick={onClose}
             sx={{
@@ -71,7 +71,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
             }}
           >
             Batal
-          </Button>
+          </Button> */}
         </Stack>
       </Box>
     </Modal>
