@@ -6,6 +6,7 @@ import { ManagePeminjamanRuangan } from "../pages/formPeminjaman/ManagePeminjama
 import { DetailApproval } from "../pages/approval/DetailApproval";
 import { Login } from "../pages/login/login";
 import { Route } from "../types/route";
+import { ManageKriteriadanSubKriteria } from "../pages/kriteria-dans-subkriteria/ManageKriteriadanSubKriteria";
 
 export const protectedRoutes: Route[] = [
   {
@@ -68,6 +69,15 @@ export const protectedRoutes: Route[] = [
     description: "Login",
     component: Login,
     path: "/login",
+    isEnabled: true,
+    appendDivider: true,
+  },
+  {
+    key: "manage-kriteria-sub-krtiteria",
+    title: "Manage Kriteria dan Sub Kriteria",
+    description: "Manage Kriteria dan Sub Kriteria",
+    component: ManageKriteriadanSubKriteria,
+    path: "/kriteria-sub-kriteria/manage-data",
     isEnabled: true,
     appendDivider: true,
   },

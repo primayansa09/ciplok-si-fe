@@ -27,6 +27,8 @@ import { ManageRuangan } from "./pages/dataRuangan/ManageRuangan";
 import { ManagePeminjamanRuangan } from "./pages/formPeminjaman/ManagePeminjamanRuangan";
 import { DetailApproval } from "./pages/approval/DetailApproval";
 import { RequireAuth } from "./routes/RequireAuth";
+import { KriteriadanSubKriteria } from "./pages/kriteria-dans-subkriteria";
+import { ManageKriteriadanSubKriteria } from "./pages/kriteria-dans-subkriteria/ManageKriteriadanSubKriteria";
 
 function App() {
   const dispatch = useDispatch();
@@ -62,6 +64,8 @@ function App() {
               <Route path="/manage-ruangan" element={<ManageRuangan />} />
               <Route path="/manage-peminjaman-ruangan" element={<ManagePeminjamanRuangan />} />
               <Route path="/detail-approval" element={<DetailApproval />} />
+              <Route path="/kriteria-sub-kriteria" element={<KriteriadanSubKriteria />} />
+              <Route path="/kriteria-sub-kriteria/manage-data" element={<ManageKriteriadanSubKriteria />} />
             </Route>
 
             {/* Catch all: redirect unknown routes */}
