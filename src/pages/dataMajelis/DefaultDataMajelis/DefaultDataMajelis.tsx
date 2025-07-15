@@ -24,9 +24,7 @@ import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
-import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
-import { format } from 'date-fns'; 
-
+// import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
@@ -41,15 +39,15 @@ export function DefaultDataMajelis() {
   const [page, setPage] = useState(pageNumber - 1);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
 
-  useEffect(() => {
-    dispatch(
-      fetchDataMajelis({
-        pageNumber: page + 1,
-        pageSize: rowsPerPage,
-        searchTerm: searchData,
-      })
-    );
-  }, [dispatch, page, rowsPerPage, searchData]);
+  // useEffect(() => {
+  //   dispatch(
+  //     fetchDataMajelis({
+  //       pageNumber: page + 1,
+  //       pageSize: rowsPerPage,
+  //       searchTerm: searchData,
+  //     })
+  //   );
+  // }, [dispatch, page, rowsPerPage, searchData]);
 
   useEffect(() => {
     if (data) {
