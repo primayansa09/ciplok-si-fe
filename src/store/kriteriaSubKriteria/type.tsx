@@ -25,8 +25,6 @@ export type Data = {
   namaKriteria: string | null;
   bobotKriteria: string | null;
   nilai: string | null;
-  namaSubKriteria: string | null;
-  bobotSubKriteria: string | null;
   kriteriaDetails: KriteriaDetails[];
 };
 
@@ -36,8 +34,6 @@ export type DataInsert = {
   namaKriteria: string | null;
   bobotKriteria: string | null;
   nilai: string | null;
-  namaSubKriteria: string | null;
-  bobotSubKriteria: string | null;
   kriteriaDetails: KriteriaDetails[];
 };
 
@@ -58,8 +54,6 @@ export type ValidateError = {
   namaKriteria: boolean;
   bobotKriteria: boolean;
   nilai: boolean;
-  namaSubKriteria: boolean;
-  bobotSubKriteria: boolean;
 };
 
 export interface LocationState {

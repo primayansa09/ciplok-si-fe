@@ -13,7 +13,7 @@ export type DataResponse = {
 
 export type DataFilter = {
     filter: {
-        codePenatua: string;
+        id: string;
     };
     sortBy: string | null;
     order: string | null;
@@ -23,9 +23,13 @@ export type DataFilter = {
 
 export type Data = {
     id: string;
-    namaKegiatan: string | null;
-    deskripsiKegiatan: string | null;
-    scoreKegiatan: string | null;
+    tanggalPemakaian: string | null;
+    tanggalPengajuan: string | null;
+    jamMulaiPemakaian: string | null;
+    jumlahOrang: string | null;
+    mjMengetahui: string | null;
+    jemaatPeminjam: string | null;
+    deskripsi: string | null;
 };
 
 export type DataInsert = {

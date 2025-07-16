@@ -9,6 +9,12 @@ import {
   InputLabel,
   Paper,
   FormHelperText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -27,14 +33,12 @@ import HeaderSection from "../../../components/commponentHeader/Header";
 
 export function ManagePeminjamanRuangan() {
   const navigate = useNavigate();
-  const [peminjam, setPeminjam] = React.useState("");
-  const [durasi, setDurasi] = React.useState("");
-  const [ruangan, setRuangan] = React.useState("");
-  const [jenisKegiatan, setJenisKegiatan] = React.useState("");
   const [mj, setMj] = React.useState("");
+  const [ruangan, setRuangan] = React.useState("");
   const [jemaatPeminjam, setJemaatPeminjam] = React.useState("");
   const location = useLocation();
   const { itemData, mode, IsEdit } = location.state || {};
+
   const [tanggalPemakaian, setTanggalPemakaian] = React.useState<Dayjs | null>(
     null
   );
@@ -111,22 +115,6 @@ export function ManagePeminjamanRuangan() {
     navigate("/pinjam-ruangan/form-peminjaman", { replace: true });
   };
 
-  const handleChangePeminjam = (event: SelectChangeEvent) => {
-    setPeminjam(event.target.value as string);
-  };
-
-  const handleChangeDurasi = (event: SelectChangeEvent) => {
-    setDurasi(event.target.value as string);
-  };
-
-  const handleChangeRuangan = (event: SelectChangeEvent) => {
-    setRuangan(event.target.value as string);
-  };
-
-  const handleChangeKegiatan = (event: SelectChangeEvent) => {
-    setJenisKegiatan(event.target.value as string);
-  };
-
   const handleTanggalPemakaian = (newValue: Dayjs | null) => {
     setTanggalPemakaian(newValue);
   };
@@ -137,6 +125,10 @@ export function ManagePeminjamanRuangan() {
 
   const handleMj = (event: SelectChangeEvent) => {
     setMj(event.target.value as string);
+  };
+
+  const handleRuangan = (event: SelectChangeEvent) => {
+    setRuangan(event.target.value as string);
   };
 
   const handleJemaatPeminjam = (event: SelectChangeEvent) => {
@@ -158,7 +150,18 @@ export function ManagePeminjamanRuangan() {
     },
   ];
 
-  const dataDummyPeminjaman = [
+  const dataDummyRutin = [
+    {
+      id: 1,
+      rutin: "Ya",
+    },
+    {
+      id: 2,
+      rutin: "TIdak",
+    },
+  ];
+
+  const dataDummy = [
     {
       id: 1,
       tanggalPemakaian: "12 Apr 2025",
@@ -216,126 +219,6 @@ export function ManagePeminjamanRuangan() {
                 ...layoutPrivateStyle.manageSubTitle,
               }}
             >
-              Peminjam <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={peminjam}
-              onChange={handleChangePeminjam}
-              error={errors.peminjam}
-            >
-              {dataDummyPeminjaman.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.peminjam}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.peminjam && (
-              <FormHelperText>
-                {errors.peminjam || "Peminjam Wajib diisi"}
-              </FormHelperText>
-            )}
-          </Grid>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Jenis Kegiatan <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={jenisKegiatan}
-              onChange={handleChangeKegiatan}
-              error={errors.jenisKegiatan}
-            >
-              {dataDummyPeminjaman.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.jenisKegiatan}
-                </MenuItem>
-              ))}
-            </Select>
-              {errors.jenisKegiatan && (
-              <FormHelperText>
-                {errors.jenisKegiatan || "Jenis Kegiatan Wajib diisi"}
-              </FormHelperText>
-            )}
-          </Grid>
-        </Grid>
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Ruangan <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={ruangan}
-              onChange={handleChangeRuangan}
-              error={errors.ruangan}
-            >
-              {dataDummyPeminjaman.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.ruangan}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.ruangan && (
-              <FormHelperText>
-                {errors.ruangan || "Ruangan Wajib diisi"}
-              </FormHelperText>
-            )}
-          </Grid>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Durasi <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={durasi}
-              onChange={handleChangeDurasi}
-              error={errors.durasi}
-            >
-              {dataDummyDurasi.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.durasi}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.durasi && (
-              <FormHelperText>
-                {errors.durasi || "Durasi Wajib diisi"}
-              </FormHelperText>
-            )}
-          </Grid>
-        </Grid>
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
               Tanggal Pemakaian <span style={{ color: "red" }}>*</span>
             </InputLabel>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -348,40 +231,15 @@ export function ManagePeminjamanRuangan() {
                       size: "small",
                       fullWidth: true,
                       error: !!errors.tanggalPemakaian,
-                      helperText: errors.tanggalPemakaian ? "Tanggal Pemakaian Wajib diisi" : ""
+                      helperText: errors.tanggalPemakaian
+                        ? "Tanggal Pemakaian Wajib diisi"
+                        : "",
                     },
                   }}
                 />
               </DemoContainer>
             </LocalizationProvider>
           </Grid>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Tanggal Pengajuan <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  value={tanggalPengajuan}
-                  onChange={handleTanggalPengajuan}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      fullWidth: true,
-                      error: !!errors.tanggalPengajuan,
-                      helperText: errors.tanggalPengajuan ? "Tanggal Pengajuan Wajib diisi" : ""
-                    },
-                  }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          </Grid>
-        </Grid>
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
             <InputLabel
               sx={{
@@ -399,47 +257,14 @@ export function ManagePeminjamanRuangan() {
                       size: "small",
                       fullWidth: true,
                       error: !!errors.jamMulaiPemakaian,
-                      helperText: errors.jamMulaiPemakaian ? "Jam Mulai Pemakaian Wajib diisi" : ""
+                      helperText: errors.jamMulaiPemakaian
+                        ? "Jam Mulai Pemakaian Wajib diisi"
+                        : "",
                     },
                   }}
                 />
               </DemoContainer>
             </LocalizationProvider>
-          </Grid>
-          <Grid size={2} marginTop={3}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
-              Tiap Minggu ?
-            </InputLabel>
-          </Grid>
-          <Grid size={4} marginTop={3}>
-            <FormGroup aria-label="position" row>
-              <FormControlLabel
-                value="Tidak"
-                control={
-                  <Checkbox
-                    checked={selectedValue === "Tidak"}
-                    onChange={() => handleChange("Tidak")}
-                  />
-                }
-                label="Tidak"
-              />
-
-              <FormControlLabel
-                value="Ya"
-                control={
-                  <Checkbox
-                    checked={selectedValue === "Ya"}
-                    onChange={() => handleChange("Ya")}
-                  />
-                }
-                label="Ya"
-              />
-            </FormGroup>
           </Grid>
         </Grid>
         <Grid container spacing={1} alignItems={"center"} marginTop={2}>
@@ -449,23 +274,27 @@ export function ManagePeminjamanRuangan() {
                 ...layoutPrivateStyle.manageSubTitle,
               }}
             >
-              Jumlah Orang <span style={{ color: "red" }}>*</span>
+              Ruangan <span style={{ color: "red" }}>*</span>
             </InputLabel>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              style={{ width: "100%" }}
               size="small"
-              fullWidth
-              error={errors.jumlahOrang}
-              helperText={errors.jumlahOrang ? "Jumlah Orang Wajib diisi" : ""}
-              //   value={formDataMajelis.codePenatua}
-              //   onChange={(e) =>
-              //     setFormDataMajelis({
-              //       ...formDataMajelis,
-              //       codePenatua: e.target.value,
-              //     })
-              //   }
-            />
+              value={ruangan}
+              onChange={handleRuangan}
+            >
+              {dataDummyDurasi.map((item) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.durasi}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.ruangan && (
+              <FormHelperText>
+                {errors.ruangan || "Ruangan Wajib diisi"}
+              </FormHelperText>
+            )}
           </Grid>
           <Grid size={6}>
             <InputLabel
@@ -490,44 +319,65 @@ export function ManagePeminjamanRuangan() {
                 </MenuItem>
               ))}
             </Select>
-             {errors.mjMengetahui && (
+            {errors.mjMengetahui && (
               <FormHelperText>
                 {errors.mjMengetahui || "MJ Mengetahui Wajib diisi"}
               </FormHelperText>
             )}
           </Grid>
         </Grid>
+
+        {IsEdit && (
+          <Grid container spacing={1} alignItems={"center"} marginTop={2}>
+            <Grid size={6}>
+              <InputLabel
+                sx={{
+                  ...layoutPrivateStyle.manageSubTitle,
+                }}
+              >
+                Status
+              </InputLabel>
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                size="small"
+                fullWidth
+                //   value={formDataMajelis.codePenatua}
+                //   onChange={(e) =>
+                //     setFormDataMajelis({
+                //       ...formDataMajelis,
+                //       codePenatua: e.target.value,
+                //     })
+                //   }
+              />
+            </Grid>
+            <Grid size={6}>
+              <InputLabel
+                sx={{
+                  ...layoutPrivateStyle.manageSubTitle,
+                }}
+              >
+                Tanggal Pengajuan
+              </InputLabel>
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                size="small"
+                fullWidth
+                //   value={formDataMajelis.codePenatua}
+                //   onChange={(e) =>
+                //     setFormDataMajelis({
+                //       ...formDataMajelis,
+                //       codePenatua: e.target.value,
+                //     })
+                //   }
+              />
+            </Grid>
+          </Grid>
+        )}
+
         <Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-                marginLeft: "15px",
-              }}
-            >
-              Jemaat Peminjam <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={jemaatPeminjam}
-              onChange={handleJemaatPeminjam}
-            >
-              {dataDummyDurasi.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.durasi}
-                </MenuItem>
-              ))}
-            </Select>
-             {errors.jemaatPeminjam && (
-              <FormHelperText>
-                {errors.jemaatPeminjam || "Jemaat Peminjam Wajib diisi"}
-              </FormHelperText>
-            )}
-          </Grid>
-          <Grid size={6} marginTop={3}>
             <Button
               type="submit"
               variant="contained"
@@ -584,6 +434,261 @@ export function ManagePeminjamanRuangan() {
             />
           </Grid>
         </Grid>
+
+        <TableContainer
+          sx={layoutPrivateStyle.manageTableContainer}
+          style={{ marginTop: 30, backgroundColor: "#FFFFFF" }}
+        >
+          <Table sx={{ minWidth: 720 }} size="small" aria-label="a dense table">
+            <TableHead sx={layoutPrivateStyle.moduleTableHead}>
+              <TableRow sx={layoutPrivateStyle.manageTableRow}>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Kriteria
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Sub Kriteria
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody sx={{ border: 1 }}>
+              <TableRow
+                sx={{
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                }}
+              >
+                <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={"Peminjam"}
+                    // onChange={(e) => {
+                    //   const newDetails = [...formKriteria.kriteriaDetails];
+                    //   newDetails[index].bobot = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: newDetails,
+                    //   });
+                    // }}
+                  />
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    textAlign: "center",
+                  }}
+                >
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    fullWidth
+                    size="small"
+                    // value={row.namaSubKriteria}
+                    // onChange={(e) => {
+                    //   const updated = [...formKriteria.kriteriaDetails];
+                    //   updated[index].namaSubKriteria = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: updated,
+                    //   });
+                    // }}
+                    //   error={errors.nilai}
+                  >
+                    {dataDummy.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.peminjam}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+              </TableRow>
+              <TableRow
+                sx={{
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                }}
+              >
+                <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={"Jenis Kegiatan"}
+                    // onChange={(e) => {
+                    //   const newDetails = [...formKriteria.kriteriaDetails];
+                    //   newDetails[index].bobot = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: newDetails,
+                    //   });
+                    // }}
+                  />
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    textAlign: "center",
+                  }}
+                >
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    fullWidth
+                    size="small"
+                    // value={"Nama Sub Kriteria *"}
+                    // onChange={(e) => {
+                    //   const updated = [...formKriteria.kriteriaDetails];
+                    //   updated[index].namaSubKriteria = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: updated,
+                    //   });
+                    // }}
+                    //   error={errors.nilai}
+                  >
+                    {dataDummy.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.jenisKegiatan}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+              </TableRow>
+              <TableRow
+                sx={{
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                }}
+              >
+                <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={"Durasi"}
+                    // onChange={(e) => {
+                    //   const newDetails = [...formKriteria.kriteriaDetails];
+                    //   newDetails[index].bobot = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: newDetails,
+                    //   });
+                    // }}
+                  />
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    textAlign: "center",
+                  }}
+                >
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    size="small"
+                    fullWidth
+                    // value={row.namaSubKriteria}
+                    // onChange={(e) => {
+                    //   const updated = [...formKriteria.kriteriaDetails];
+                    //   updated[index].namaSubKriteria = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: updated,
+                    //   });
+                    // }}
+                    //   error={errors.nilai}
+                  >
+                    {dataDummyDurasi.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.durasi}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+              </TableRow>
+              <TableRow
+                sx={{
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                }}
+              >
+                <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={"Rutin"}
+                    // onChange={(e) => {
+                    //   const newDetails = [...formKriteria.kriteriaDetails];
+                    //   newDetails[index].bobot = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: newDetails,
+                    //   });
+                    // }}
+                  />
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    textAlign: "center",
+                  }}
+                >
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    size="small"
+                    fullWidth
+                    // value={row.namaSubKriteria}
+                    // onChange={(e) => {
+                    //   const updated = [...formKriteria.kriteriaDetails];
+                    //   updated[index].namaSubKriteria = e.target.value;
+                    //   setFormKriteria({
+                    //     ...formKriteria,
+                    //     kriteriaDetails: updated,
+                    //   });
+                    // }}
+                    //   error={errors.nilai}
+                  >
+                    {dataDummyRutin.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.rutin}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {/* {errors.nilai && (
+                              <FormHelperText>
+                                {errors.nilai || "Nilai Wajib diisi"}
+                              </FormHelperText>
+                            )} */}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
         <Grid
           container
           spacing={2}

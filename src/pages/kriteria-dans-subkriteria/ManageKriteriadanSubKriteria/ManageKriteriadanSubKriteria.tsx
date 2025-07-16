@@ -44,8 +44,6 @@ export function ManageKriteriadanSubKriteria() {
     namaKriteria: "",
     bobotKriteria: "",
     nilai: "",
-    namaSubKriteria: "",
-    bobotSubKriteria: "",
     kriteriaDetails: initialKriteriaDetails,
   });
 
@@ -54,8 +52,6 @@ export function ManageKriteriadanSubKriteria() {
     namaKriteria: false,
     bobotKriteria: false,
     nilai: false,
-    namaSubKriteria: false,
-    bobotSubKriteria: false,
   });
 
   const handleSubmit = () => {
@@ -64,8 +60,6 @@ export function ManageKriteriadanSubKriteria() {
       namaKriteria: (formKriteria.namaKriteria ?? "").trim() === "",
       bobotKriteria: (formKriteria.bobotKriteria ?? "").trim() === "",
       nilai: (formKriteria.nilai ?? "").trim() === "",
-      namaSubKriteria: (formKriteria.bobotSubKriteria ?? "").trim() === "",
-      bobotSubKriteria: (formKriteria.bobotSubKriteria ?? "").trim() === "",
     };
 
     setErrors(newErrors);
@@ -89,10 +83,6 @@ export function ManageKriteriadanSubKriteria() {
 
   const handleChangeNilai = (event: SelectChangeEvent) => {
     setNilai(event.target.value as string);
-  };
-
-  const handleChangeDetails = (event: SelectChangeEvent) => {
-    setDetails(event.target.value as string);
   };
 
   const addRow = () => {
@@ -251,60 +241,6 @@ export function ManageKriteriadanSubKriteria() {
                 {errors.nilai || "Nilai Wajib diisi"}
               </FormHelperText>
             )}
-          </Grid>
-        </Grid>
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Nama Sub Kriteria <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
-              size="small"
-              fullWidth
-              error={errors.namaSubKriteria}
-              helperText={
-                errors.namaSubKriteria ? " Nama Sub Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.namaSubKriteria}
-              onChange={(e) =>
-                setFormKriteria({
-                  ...formKriteria,
-                  namaSubKriteria: e.target.value,
-                })
-              }
-            />
-          </Grid>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Bobot Sub Kriteria <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
-              size="small"
-              fullWidth
-              error={errors.bobotKriteria}
-              helperText={
-                errors.bobotKriteria ? " Bobot Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.bobotKriteria}
-              onChange={(e) =>
-                setFormKriteria({
-                  ...formKriteria,
-                  bobotKriteria: e.target.value,
-                })
-              }
-            />
           </Grid>
         </Grid>
         <TableContainer

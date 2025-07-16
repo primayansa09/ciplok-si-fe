@@ -29,70 +29,43 @@ export function DefaultKriteriadanSubKriteria() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const dataDummyPeminjam = [
-    {
-      codePenatua: "PNT001",
-      namaPenatua: "Wanda Primayansa",
-      jabatan: "Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "081234567890",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "MJ",
-    },
-    {
-      codePenatua: "PNT002",
-      namaPenatua: "Sinta Dewi",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "082345678901",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT003",
-      namaPenatua: "Budi Santoso",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "083456789012",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-  ];
+  const dataKriteria = [
+  {
+    id: 1,
+    kodeKriteria: "K1",
+    namaKriteria: "Jenis Kegiatan",
+    detail: [
+      { subKriteria: 8, bobot: 25 }
+    ]
+  },
+  {
+    id: 2,
+    kodeKriteria: "K2",
+    namaKriteria: "Durasi",
+    detail: [
+      { subKriteria: 5, bobot: 10 }
+    ]
+  },
+  {
+    id: 3,
+    kodeKriteria: "K3",
+    namaKriteria: "Status Rutin",
+    detail: [
+      { subKriteria: 2, bobot: 40 }
+    ]
+  },
+  {
+    id: 4,
+    kodeKriteria: "K4",
+    namaKriteria: "Peminjam",
+    detail: [
+      { subKriteria: 7, bobot: 25 }
+    ]
+  }
+];
 
-  const [dataBind, setDataBind] = useState({ data: dataDummyPeminjam });
+
+  const [dataBind, setDataBind] = useState({ data: dataKriteria });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
@@ -133,7 +106,7 @@ export function DefaultKriteriadanSubKriteria() {
 
   useEffect(() => {
     const filtered = dataBind.data.filter((item: any) =>
-      item.namaPenatua?.toLowerCase().includes(searchData.toLowerCase())
+      item.kodeKriteria?.toLowerCase().includes(searchData.toLowerCase())
     );
     setFilteredData(filtered);
   }, [searchData, dataBind.data]);
@@ -243,9 +216,9 @@ export function DefaultKriteriadanSubKriteria() {
               {filteredData.length > 0 ? (
                 filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex: any, index) => (
+                  .map((ex: any) => (
                     <TableRow
-                      key={ex.codePenatua}
+                      key={ex.kodeKriteria}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -253,7 +226,10 @@ export function DefaultKriteriadanSubKriteria() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.namaPenatua}
+                        {ex.kodeKriteria}
+                      </TableCell>
+                      <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                        {ex.namaKriteria}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -261,7 +237,7 @@ export function DefaultKriteriadanSubKriteria() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.noWhatsApp}
+                        {ex.detail?.[0]?.bobot ?? '-'}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -269,15 +245,7 @@ export function DefaultKriteriadanSubKriteria() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.alamatPenatua}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.anggotaKomisi}
+                        {ex.detail?.[0]?.subKriteria ?? '-'}
                       </TableCell>
                       <TableCell
                         sx={{
