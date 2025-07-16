@@ -18,7 +18,7 @@ import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import DoneIcon from "@mui/icons-material/Done";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchApprovalByDate } from "../../../api/dataApproval";
-import { ReservationData, ScoreData } from "../../../store/formPeminjaman/type";
+import { ReservationData, ScoreData,  } from "../../../store/formPeminjaman/type";
 
 export function DetailApproval() {
   const navigate = useNavigate();

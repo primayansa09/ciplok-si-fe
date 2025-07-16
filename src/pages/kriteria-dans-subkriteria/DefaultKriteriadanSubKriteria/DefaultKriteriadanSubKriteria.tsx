@@ -24,79 +24,16 @@ import logo from "../../../assets/logo.png";
 import { Data, DataFilter } from "../../../store/kriteriaSubKriteria/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { fetchDataCriteria } from "../../../api/dataCriteria";
 
 export function DefaultKriteriadanSubKriteria() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
-  const dataDummyPeminjam = [
-    {
-      codePenatua: "PNT001",
-      namaPenatua: "Wanda Primayansa",
-      jabatan: "Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "081234567890",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "MJ",
-    },
-    {
-      codePenatua: "PNT002",
-      namaPenatua: "Sinta Dewi",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "082345678901",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT003",
-      namaPenatua: "Budi Santoso",
-      jabatan: "Wakil Ketua",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "083456789012",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Komisi Pemuda",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-    {
-      codePenatua: "PNT004",
-      namaPenatua: "Rina Marlina",
-      jabatan: "Bendahara",
-      alamatPenatua: "Jakarta",
-      noWhatsApp: "084567890123",
-      periodeAwal: "01 Jan 2023",
-      periodeAkhir: "31 Des 2025",
-      anggotaKomisi: "Panitia",
-    },
-  ];
-
-  const [dataBind, setDataBind] = useState({ data: dataDummyPeminjam });
+  const [dataBind, setDataBind] = useState<Data[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
+  const [filteredData, setFilteredData] = useState<Data[]>([]);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -116,6 +53,8 @@ export function DefaultKriteriadanSubKriteria() {
     navigate("/kriteria-sub-kriteria/manage-data", { replace: true });
   };
 
+
+
   const clickEditData = (item: Data) => {
     navigate("/kriteria-sub-kriteria/manage-data", {
       state: {
@@ -126,17 +65,34 @@ export function DefaultKriteriadanSubKriteria() {
     });
   };
 
+
   const handleDelete = () => {
     console.log("Data dihapus!");
     setOpen(false);
   };
 
+  // useEffect(() => {
+  //   const filtered = dataBind.data.filter((item: any) =>
+  //     item.kodeKriteria?.toLowerCase().includes(searchData.toLowerCase())
+  //   );
+  //   setFilteredData(filtered);
+  // }, [searchData, dataBind.data]);
+
+
   useEffect(() => {
-    const filtered = dataBind.data.filter((item: any) =>
-      item.namaPenatua?.toLowerCase().includes(searchData.toLowerCase())
-    );
-    setFilteredData(filtered);
-  }, [searchData, dataBind.data]);
+    const loadData = async () => {
+      try {
+        const response = await fetchDataCriteria();
+        if (response.statusCode === 200) {
+          setDataBind(response.data);
+          setFilteredData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    loadData();
+  }, []);
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -225,7 +181,7 @@ export function DefaultKriteriadanSubKriteria() {
                     textAlign: "center",
                   }}
                 >
-                  Sub Kriteria
+                  Attribute
                 </TableCell>
                 <TableCell
                   sx={{
@@ -243,17 +199,20 @@ export function DefaultKriteriadanSubKriteria() {
               {filteredData.length > 0 ? (
                 filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex: any, index) => (
+                  .map((ex: any) => (
                     <TableRow
-                      key={ex.codePenatua}
+                      key={ex.criteriaCode}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
                         },
                       }}
                     >
-                      <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.namaPenatua}
+                      <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                        {ex.criteriaCode}
+                      </TableCell>
+                      <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                        {ex.criteriaName}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -261,7 +220,7 @@ export function DefaultKriteriadanSubKriteria() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.noWhatsApp}
+                        {ex.bobot}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -269,15 +228,7 @@ export function DefaultKriteriadanSubKriteria() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.alamatPenatua}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.anggotaKomisi}
+                        {ex.parameter ? "Maksimal" : "Minimal"}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -333,7 +284,7 @@ export function DefaultKriteriadanSubKriteria() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
+            count={dataBind.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}

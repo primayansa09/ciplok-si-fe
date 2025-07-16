@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Divider,
   Grid,
   Stack,
   TextField,
@@ -20,7 +19,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import { Data, DataFilter } from "../../../store/dataJemaat/type";
+import { Data } from "../../../store/dataJemaat/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchDataJemaat } from "../../../api/dataJemaat";  // Adjust the import for your API

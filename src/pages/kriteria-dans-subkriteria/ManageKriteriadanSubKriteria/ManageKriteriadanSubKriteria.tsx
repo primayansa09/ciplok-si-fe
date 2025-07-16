@@ -8,7 +8,6 @@ import {
   TextField,
   InputLabel,
   Paper,
-  FormHelperText,
   Box,
   Table,
   TableBody,
@@ -16,56 +15,55 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  FormHelperText,
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   DataInsert,
-  LocationState,
-  KriteriaDetails,
-  initialKriteriaDetails,
+  initialCriteriaDetails,
   ValidateError,
 } from "../../../store/kriteriaSubKriteria/type";
+import MessageModal from "../../../components/Modal/MessageModal";
+import { createDataCriteria, editDataCriteria } from "../../../api/dataCriteria";
 
 export function ManageKriteriadanSubKriteria() {
   const navigate = useNavigate();
-  const [nilai, setNilai] = React.useState("");
-  const [details, setDetails] = React.useState("");
   const location = useLocation();
-  const { itemData, mode, IsEdit } = location.state || {};
 
+  const [dataDummyNilai, setDataDummyNilai] = useState<any[]>([
+    { id: 1, value: "Maksimum" },
+    { id: 0, value: "Minimum" },
+  ]);
+
+  const { itemData, mode, IsEdit } = location.state || {};
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [redirectTo, setRedirectTo] = useState("");
   const [formKriteria, setFormKriteria] = useState<DataInsert>({
-    id: "",
-    kodeKriteria: "",
-    namaKriteria: "",
-    bobotKriteria: "",
-    nilai: "",
-    namaSubKriteria: "",
-    bobotSubKriteria: "",
-    kriteriaDetails: initialKriteriaDetails,
+    criteriaCode: null,
+    idHeaderCriteria: 0,
+    bobot: null,
+    criteriaName: "",
+    parameter: "",
+    subCriteriaList: initialCriteriaDetails,
   });
 
   const [errors, setErrors] = useState<ValidateError>({
-    kodeKriteria: false,
-    namaKriteria: false,
-    bobotKriteria: false,
-    nilai: false,
-    namaSubKriteria: false,
-    bobotSubKriteria: false,
+    criteriaName: false,
+    bobot: false,
+    parameter: false,
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {
-      kodeKriteria: (formKriteria.kodeKriteria ?? "").trim() === "",
-      namaKriteria: (formKriteria.namaKriteria ?? "").trim() === "",
-      bobotKriteria: (formKriteria.bobotKriteria ?? "").trim() === "",
-      nilai: (formKriteria.nilai ?? "").trim() === "",
-      namaSubKriteria: (formKriteria.bobotSubKriteria ?? "").trim() === "",
-      bobotSubKriteria: (formKriteria.bobotSubKriteria ?? "").trim() === "",
+      criteriaName: (formKriteria.criteriaName ?? "").trim() === "",
+      bobot: (formKriteria.bobot ?? "").trim() === "",
+      parameter: (formKriteria.parameter ?? "").trim() === "",
     };
 
     setErrors(newErrors);
@@ -75,11 +73,52 @@ export function ManageKriteriadanSubKriteria() {
     if (!isValid) {
       return;
     }
+
+    try {
+      let response;
+      if (formKriteria.idHeaderCriteria == 0 || formKriteria.idHeaderCriteria === null) {
+        response = await createDataCriteria(formKriteria);
+        if (response.statusCode === 200) {
+          setFormKriteria({
+            criteriaCode: null,
+            idHeaderCriteria: 0,
+            bobot: null,
+            criteriaName: "",
+            parameter: "",
+            subCriteriaList: initialCriteriaDetails,
+          });
+          setModalMessage(response.message || "Data created successfully!");
+          setRedirectTo("/kriteria-sub-kriteria");
+          setOpenModal(true);
+        }
+      } else {
+        response = await editDataCriteria(formKriteria.idHeaderCriteria, formKriteria);
+        if (response.statusCode === 200) {
+          setFormKriteria({
+            criteriaCode: null,
+            idHeaderCriteria: 0,
+            bobot: null,
+            criteriaName: "",
+            parameter: "",
+            subCriteriaList: initialCriteriaDetails,
+          });
+          setModalMessage(response.message || "Data updated successfully!");
+          setRedirectTo("/kriteria-sub-kriteria");
+          setOpenModal(true);
+        }
+      }
+    } catch (ex) {
+      setModalMessage("An error occurred while submitting the form.");
+      setOpenModal(true);
+    }
   };
 
   useEffect(() => {
     if (IsEdit && itemData) {
-      setFormKriteria(itemData);
+      setFormKriteria({
+        ...itemData,
+        parameter: itemData.parameter || "",
+      });
     }
   }, [IsEdit, itemData]);
 
@@ -87,94 +126,83 @@ export function ManageKriteriadanSubKriteria() {
     navigate("/kriteria-sub-kriteria", { replace: true });
   };
 
-  const handleChangeNilai = (event: SelectChangeEvent) => {
-    setNilai(event.target.value as string);
-  };
-
-  const handleChangeDetails = (event: SelectChangeEvent) => {
-    setDetails(event.target.value as string);
-  };
-
   const addRow = () => {
     setFormKriteria((prevData) => ({
       ...prevData,
-      kriteriaDetails: [
-        ...prevData.kriteriaDetails,
+      subCriteriaList: [
+        ...prevData.subCriteriaList,
         {
-          namaSubKriteria: "",
-          bobot: "",
+          idCriteria: null,
+          idSubCriteria: null,
+          subCriteriaBobot: null,
+          subCriteriaName: "",
         },
       ],
     }));
   };
 
   const handleDeleteRow = (index: number) => {
-    const updateKriteria = [...formKriteria.kriteriaDetails];
+    const updateKriteria = [...formKriteria.subCriteriaList];
     updateKriteria.splice(index, 1);
     setFormKriteria((prevData) => ({
       ...prevData,
-      kriteriaDetails: updateKriteria,
+      subCriteriaList: updateKriteria,
     }));
   };
 
-  const dataDummyNilai = [
-    {
-      id: 1,
-      durasi: "Maksimum",
-    },
-    {
-      id: 2,
-      durasi: "Minimum",
-    },
-  ];
+  const handleBobotChange = (e: any) => {
+    const value = e.target.value;
+    const isValid = /^[1-9]$|^[1-9][0-9]$|^100$/.test(value);
+    if (isValid || value === '') {
+      setFormKriteria({
+        ...formKriteria,
+        bobot: value,
+      });
+    }
 
-  const dataDummyDetail = [
-    {
-      id: 1,
-      value: "Ibadah",
-    },
-    {
-      id: 2,
-      value: "Latihan Ibadah",
-    },
-    {
-      id: 3,
-      value: "Latihan Pengisi Pujian",
-    },
-  ];
+    if (!isValid && value !== '') {
+      setErrors({
+        ...errors,
+        bobot: true,
+      });
+    } else {
+      setErrors({
+        ...errors,
+        bobot: false,
+      });
+    }
+  };
+
+  const closeModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);
+    navigate(redirectTo, { replace: true });
+  };
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
-      <InputLabel
-        sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}
-      >
+      <InputLabel sx={{ ...layoutPrivateStyle.manageTitleHeader, marginTop: 5 }}>
         Master Data Kriteria
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Kode Kriteria
-            </InputLabel>
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle }}>Kode Kriteria</InputLabel>
             <TextField
               id="outlined-basic"
               variant="outlined"
               size="small"
               fullWidth
               disabled
+              value={IsEdit ? formKriteria.criteriaCode : ""}
             />
           </Grid>
           <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle }}>
               Nama Kriteria <span style={{ color: "red" }}>*</span>
             </InputLabel>
             <TextField
@@ -182,27 +210,22 @@ export function ManageKriteriadanSubKriteria() {
               variant="outlined"
               size="small"
               fullWidth
-              error={errors.namaKriteria}
-              helperText={
-                errors.namaKriteria ? " Nama Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.namaKriteria}
+              error={errors.criteriaName}
+              helperText={errors.criteriaName ? " Nama Kriteria Wajib diisi" : ""}
+              value={formKriteria.criteriaName}
               onChange={(e) =>
                 setFormKriteria({
                   ...formKriteria,
-                  namaKriteria: e.target.value,
+                  criteriaName: e.target.value,
                 })
               }
             />
           </Grid>
         </Grid>
+
         <Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle }}>
               Bobot Kriteria <span style={{ color: "red" }}>*</span>
             </InputLabel>
             <TextField
@@ -210,25 +233,14 @@ export function ManageKriteriadanSubKriteria() {
               variant="outlined"
               size="small"
               fullWidth
-              error={errors.bobotKriteria}
-              helperText={
-                errors.bobotKriteria ? " Bobot Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.bobotKriteria}
-              onChange={(e) =>
-                setFormKriteria({
-                  ...formKriteria,
-                  bobotKriteria: e.target.value,
-                })
-              }
+              error={errors.bobot}
+              helperText={errors.bobot ? " Bobot Kriteria Wajib diisi" : ""}
+              value={formKriteria.bobot}
+              onChange={handleBobotChange}
             />
           </Grid>
           <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
+            <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle }}>
               Nilai <span style={{ color: "red" }}>*</span>
             </InputLabel>
             <Select
@@ -236,77 +248,28 @@ export function ManageKriteriadanSubKriteria() {
               id="demo-simple-select"
               style={{ width: "100%" }}
               size="small"
-              value={nilai}
-              onChange={handleChangeNilai}
-              error={errors.nilai}
+              value={formKriteria.parameter}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormKriteria({
+                  ...formKriteria,
+                  parameter: value,
+                });
+              }}
+              error={errors.parameter}
             >
               {dataDummyNilai.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.durasi}
+                <MenuItem key={item.id} value={item.value}>
+                  {item.value}
                 </MenuItem>
               ))}
             </Select>
-            {errors.nilai && (
-              <FormHelperText>
-                {errors.nilai || "Nilai Wajib diisi"}
-              </FormHelperText>
+            {errors.parameter && (
+              <FormHelperText>{errors.parameter || "Nilai Wajib diisi"}</FormHelperText>
             )}
           </Grid>
         </Grid>
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Nama Sub Kriteria <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
-              size="small"
-              fullWidth
-              error={errors.namaSubKriteria}
-              helperText={
-                errors.namaSubKriteria ? " Nama Sub Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.namaSubKriteria}
-              onChange={(e) =>
-                setFormKriteria({
-                  ...formKriteria,
-                  namaSubKriteria: e.target.value,
-                })
-              }
-            />
-          </Grid>
-          <Grid size={6}>
-            <InputLabel
-              sx={{
-                ...layoutPrivateStyle.manageSubTitle,
-              }}
-            >
-              Bobot Sub Kriteria <span style={{ color: "red" }}>*</span>
-            </InputLabel>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
-              size="small"
-              fullWidth
-              error={errors.bobotKriteria}
-              helperText={
-                errors.bobotKriteria ? " Bobot Kriteria Wajib diisi" : ""
-              }
-              value={formKriteria.bobotKriteria}
-              onChange={(e) =>
-                setFormKriteria({
-                  ...formKriteria,
-                  bobotKriteria: e.target.value,
-                })
-              }
-            />
-          </Grid>
-        </Grid>
+
         <TableContainer
           sx={layoutPrivateStyle.manageTableContainer}
           style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}
@@ -347,78 +310,52 @@ export function ManageKriteriadanSubKriteria() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {formKriteria.kriteriaDetails.map((row, index) => (
-                <TableRow
-                  key={index}
-                  sx={{
-                    "&:last-child td, &:last-child th": {
-                      border: 0,
-                    },
-                  }}
-                >
+              {formKriteria.subCriteriaList.map((row, index) => (
+                <TableRow key={index} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      style={{ width: "100%" }}
-                      size="small"
-                      value={row.namaSubKriteria}
-                      onChange={(e) => {
-                        const updated = [...formKriteria.kriteriaDetails];
-                        updated[index].namaSubKriteria = e.target.value;
-                        setFormKriteria({
-                          ...formKriteria,
-                          kriteriaDetails: updated,
-                        });
-                      }}
-                      //   error={errors.nilai}
-                    >
-                      {dataDummyDetail.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.value}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {/* {errors.nilai && (
-                      <FormHelperText>
-                        {errors.nilai || "Nilai Wajib diisi"}
-                      </FormHelperText>
-                    )} */}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      ...layoutPrivateStyle.manageTableCell,
-                      textAlign: "center",
-                    }}
-                  >
                     <TextField
                       id="outlined-basic"
                       variant="outlined"
                       size="small"
                       fullWidth
-                      value={row.bobot || ""}
+                      value={row.subCriteriaName}
                       onChange={(e) => {
-                        const newDetails = [...formKriteria.kriteriaDetails];
-                        newDetails[index].bobot = e.target.value;
+                        const newDetails = [...formKriteria.subCriteriaList];
+                        newDetails[index].subCriteriaName = e.target.value;
                         setFormKriteria({
                           ...formKriteria,
-                          kriteriaDetails: newDetails,
+                          subCriteriaList: newDetails,
                         });
                       }}
                     />
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      ...layoutPrivateStyle.manageTableCell,
-                      textAlign: "center",
-                    }}
-                  >
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      justifyContent="center"
-                      gap={1}
-                    >
+
+                  <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                    <TextField
+                      id="outlined-basic"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={row.subCriteriaBobot}
+                      onChange={(e) => {
+                        const newDetails = [...formKriteria.subCriteriaList];
+                        const value = e.target.value;
+                        if (!isNaN(Number(value)) || value === '') {
+                          newDetails[index].subCriteriaBobot = Number(value);
+                          setFormKriteria({
+                            ...formKriteria,
+                            subCriteriaList: newDetails,
+                          });
+                        }
+                      }}
+                      inputProps={{
+                        pattern: "[0-9]*",
+                      }}
+                    />
+                  </TableCell>
+
+                  <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                    <Box display="flex" flexDirection="row" justifyContent="center" gap={1}>
                       <InputLabel
                         onClick={addRow}
                         sx={{
@@ -429,7 +366,7 @@ export function ManageKriteriadanSubKriteria() {
                       >
                         <AddIcon />
                       </InputLabel>
-                      {formKriteria.kriteriaDetails.length > 1 && (
+                      {formKriteria.subCriteriaList.length > 1 && (
                         <InputLabel
                           onClick={() => handleDeleteRow(index)}
                           sx={{
@@ -447,14 +384,8 @@ export function ManageKriteriadanSubKriteria() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Box display="flex" justifyContent="flex-start" mt={2}></Box>
-        <Grid
-          container
-          spacing={2}
-          justifyContent={"flex-end"}
-          alignItems={"center"}
-          marginTop={2}
-        >
+
+        <Grid container spacing={2} justifyContent={"flex-end"} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
             <Button
               type="submit"
@@ -464,6 +395,13 @@ export function ManageKriteriadanSubKriteria() {
             >
               Submit
             </Button>
+            <MessageModal
+              open={openModal}
+              onClose={closeModal}
+              onConfirm={handleModalConfirm}
+              message={modalMessage}
+              redirectTo={redirectTo}
+            />
           </Grid>
           <Grid size={2}>
             <Button

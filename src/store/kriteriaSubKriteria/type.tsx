@@ -20,46 +20,44 @@ export type DataFilter = {
 };
 
 export type Data = {
-  id: string;
-  kodeKriteria: string | null;
-  namaKriteria: string | null;
-  bobotKriteria: string | null;
-  nilai: string | null;
-  namaSubKriteria: string | null;
-  bobotSubKriteria: string | null;
-  kriteriaDetails: KriteriaDetails[];
+  idHeaderCriteria: number | null;
+  criteriaCode: string | null;
+  criteriaName: string | null;
+  bobot: string | null;
+  parameter: string;
+  subCriteriaList: CriteriaDetails[];
 };
 
 export type DataInsert = {
-  id: string;
-  kodeKriteria: string | null;
-  namaKriteria: string | null;
-  bobotKriteria: string | null;
-  nilai: string | null;
-  namaSubKriteria: string | null;
-  bobotSubKriteria: string | null;
-  kriteriaDetails: KriteriaDetails[];
+  idHeaderCriteria: number | null;
+  criteriaCode: string | null;
+  criteriaName: string | null;
+  bobot: string | null;
+  parameter: string;
+  subCriteriaList: CriteriaDetails[];
 };
 
-export const initialKriteriaDetails: KriteriaDetails[] = [
+export const initialCriteriaDetails: CriteriaDetails[] = [
   {
-    namaSubKriteria: "",
-    bobot: "",
+    idSubCriteria: null,
+    idCriteria: null,
+    subCriteriaBobot: null,
+    subCriteriaName: "",
+
   },
 ];
 
-export type KriteriaDetails = {
-  namaSubKriteria: string;
-  bobot: string;
+export type CriteriaDetails = {
+  idSubCriteria: number | null;
+  idCriteria: number | null;
+  subCriteriaName: string;
+  subCriteriaBobot: number | null;
 };
 
 export type ValidateError = {
-  kodeKriteria: boolean;
-  namaKriteria: boolean;
-  bobotKriteria: boolean;
-  nilai: boolean;
-  namaSubKriteria: boolean;
-  bobotSubKriteria: boolean;
+  criteriaName: boolean;
+  bobot: boolean;
+  parameter: boolean;
 };
 
 export interface LocationState {

@@ -13,7 +13,7 @@ export type DataResponse = {
 
 export type DataFilter = {
     filter: {
-        codePenatua: string;
+        id: string;
     };
     sortBy: string | null;
     order: string | null;
@@ -22,21 +22,7 @@ export type DataFilter = {
 };
 
 export type Data = {
-    transactionID: number;
-    status: string | null;
-    roomName: string | null;
-    reservationDate: string | null;
-    description:string;
-    mjRequest:string;
-    createdBy:string;
-};
-
-export type DataInsert = {
     id: string;
-    peminjaman: string | null;
-    jenisKegiatan: string | null;
-    ruangan: string | null;
-    durasi: string | null;
     tanggalPemakaian: string | null;
     tanggalPengajuan: string | null;
     jamMulaiPemakaian: string | null;
@@ -44,6 +30,42 @@ export type DataInsert = {
     mjMengetahui: string | null;
     jemaatPeminjam: string | null;
     deskripsi: string | null;
+};
+
+export type DataMJ = {
+    userID: string;
+    email: string | null;
+    anggotaKomisi: string | null;
+    password: string | null;
+    phoneNo: string | null;
+    fullName: string;
+    address: string;
+    alternatePhoneNo: string;
+};
+
+export type DataInsert = {
+    transactionID: string;
+    status: string | null;
+    startTime: string | null;
+    roomName: string | null;
+    reservationDate: Date;
+    createdDate: Date;
+    createdBy: string | null;
+    description: string | null;
+    mjRequest: string | null;
+    mjMengetahui: string | null;
+    details: DetailData[];
+};
+
+export type DetailData = {
+  criteriaCode: string;
+  criteriaName: string;
+  criteriaID:number;
+  subCriteriaID:number;
+  bobot:number;
+  subCriteriaName:string;
+  subCriteriaBobot:number;
+  parameter:boolean;
 };
 
 export type ReservationData = {
@@ -59,7 +81,6 @@ export type ReservationData = {
 
 };
 
-
 export type ScoreData = {
     transactionID: number;
     tanggalPengajuan:string;
@@ -67,7 +88,6 @@ export type ScoreData = {
     finalScore:string;
 
 };
-
 
 export type ValidateError = {
     codePenatua: boolean;
