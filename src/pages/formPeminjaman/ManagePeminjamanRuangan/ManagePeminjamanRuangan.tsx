@@ -36,6 +36,7 @@ import { Criteria, CriteriaData, DataInsert, DataMJ, DetailData, initialCriteria
 import { createFormRequest, fetchDataCriteriaRequest, fetchDataMajelis } from "../../../api/dataRequestForm";
 import { fetchDataCriteria } from "../../../api/dataCriteria";
 import MessageModal from "../../../components/Modal/MessageModal";
+import { debug } from "console";
 
 export function ManagePeminjamanRuangan() {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ export function ManagePeminjamanRuangan() {
   const [tanggalPengajuan, setTanggalPengajuan] = React.useState<Dayjs | null>(
     null
   );
+
   const [selectedValue, setSelectedValue] = useState<null | "Ya" | "Tidak">(
     null
   );
@@ -76,7 +78,7 @@ export function ManagePeminjamanRuangan() {
     subCriteriaList: []
   });
 
-  const [criteriaData, setCriteriaData] = useState<Criteria[]>();
+  const [criteriaData, setCriteriaData] = useState<Criteria[]>([]);
 
   const [errors, setErrors] = useState({
     peminjam: false,
@@ -92,11 +94,6 @@ export function ManagePeminjamanRuangan() {
     deskripsi: false,
   });
 
-  useEffect(() => {
-    if (IsEdit && itemData) {
-      setFormPeminjaman(itemData);
-    }
-  }, [IsEdit, itemData]);
 
 
   useEffect(() => {
@@ -122,9 +119,59 @@ export function ManagePeminjamanRuangan() {
     loadData();
   }, []);
 
-  useEffect(() => { }, [criteriaData])
+  useEffect(() => {
+    if (IsEdit && itemData && criteriaData!.length > 0) {
+      console.log(itemData)
+      console.log(criteriaData)
+      const mappedSubCriteriaList: DetailData[] = itemData.subCriteriaList.map((existingSub: DetailData) => {
+        const matchingCriteria = criteriaData.find(
+          (criteria) => criteria.idHeaderCriteria === existingSub.criteriaID
+        );
+
+        if (!matchingCriteria) {
+          return existingSub;
+
+        }
+
+        const selectedSub = matchingCriteria.subCriteriaList.find(
+          (sub) => sub.idSubCriteria.toString() === existingSub.subCriteriaID.toString()
+        );
+
+        if (!selectedSub) {
+          return existingSub;
+        }
+
+        return {
+          criteriaID: matchingCriteria.idHeaderCriteria,
+          subCriteriaID: selectedSub.idSubCriteria.toString(),
+          subCriteriaName: selectedSub.subCriteriaName,
+          subCriteriaBobot: selectedSub.subCriteriaBobot,
+        };
+      });
+
+      setFormPeminjaman({
+        ...itemData,
+        subCriteriaList: mappedSubCriteriaList,
+      });
 
 
+      if (itemData.createdDate) {
+        setTanggalPengajuan(dayjs(itemData.createdDate));
+      }
+
+      if (itemData.reservationDate) {
+        setTanggalPemakaian(dayjs(itemData.reservationDate));
+      }
+    }
+  }, [IsEdit, itemData, criteriaData]);
+
+
+
+  useEffect(() => {
+
+  }, [criteriaData])
+
+  useEffect(() => { }, [formPeminjaman])
   const clickCancel = () => {
     navigate("/pinjam-ruangan/form-peminjaman", { replace: true });
   };
@@ -256,6 +303,7 @@ export function ManagePeminjamanRuangan() {
                 <DatePicker
                   value={tanggalPemakaian}
                   onChange={handleTanggalPemakaian}
+                  format="DD-MMMM-YYYY"
                   slotProps={{
                     textField: {
                       size: "small",
@@ -399,13 +447,14 @@ export function ManagePeminjamanRuangan() {
                 variant="outlined"
                 size="small"
                 fullWidth
-              //   value={formDataMajelis.codePenatua}
-              //   onChange={(e) =>
-              //     setFormDataMajelis({
-              //       ...formDataMajelis,
-              //       codePenatua: e.target.value,
-              //     })
-              //   }
+                value={formPeminjaman.status}
+                onChange={(e) =>
+                  setFormPeminjaman({
+                    ...formPeminjaman,
+                    status: e.target.value,
+                  })
+                }
+                disabled
               />
             </Grid>
             <Grid size={6}>
@@ -416,19 +465,26 @@ export function ManagePeminjamanRuangan() {
               >
                 Tanggal Pengajuan
               </InputLabel>
-              <TextField
-                id="outlined-basic"
-                variant="outlined"
-                size="small"
-                fullWidth
-              //   value={formDataMajelis.codePenatua}
-              //   onChange={(e) =>
-              //     setFormDataMajelis({
-              //       ...formDataMajelis,
-              //       codePenatua: e.target.value,
-              //     })
-              //   }
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={["DatePicker"]}>
+                  <DatePicker
+                    value={tanggalPengajuan}
+                    onChange={handleTanggalPemakaian}
+                    format="DD-MMMM-YYYY"
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        fullWidth: true,
+                        error: !!errors.tanggalPemakaian,
+                        helperText: errors.tanggalPemakaian
+                          ? "Tanggal Pemakaian Wajib diisi"
+                          : "",
+                      },
+                    }}
+                    disabled
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
             </Grid>
           </Grid>
         )}

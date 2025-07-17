@@ -28,7 +28,7 @@ export function Login() {
   const handleLogin = async () => {
     const resultAction = await dispatch(login({ email, password }));
     if (login.fulfilled.match(resultAction)) {
-      navigate("/master-data/data-majelis");
+      navigate("/dashboard");
     }
   };
 

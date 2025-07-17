@@ -4,6 +4,7 @@ import { DetailApproval } from "../pages/approval/DetailApproval";
 import { Login } from "../pages/login/login";
 import { Route } from "../types/route";
 import { ManageKriteriadanSubKriteria } from "../pages/kriteria-dans-subkriteria/ManageKriteriadanSubKriteria";
+import { Dashboard } from "../pages/dashboard/Dashboard";
 
 export const protectedRoutes: Route[] = [
   {
@@ -48,6 +49,15 @@ export const protectedRoutes: Route[] = [
     description: "Manage Kriteria dan Sub Kriteria",
     component: ManageKriteriadanSubKriteria,
     path: "/kriteria-sub-kriteria/manage-data",
+    isEnabled: true,
+    appendDivider: true,
+  },
+    {
+    key: "dashboard",
+    title: "Dashboard",
+    description: "Dashboard",
+    component: Dashboard,
+    path: "/dashboard",
     isEnabled: true,
     appendDivider: true,
   },

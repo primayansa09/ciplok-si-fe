@@ -169,7 +169,7 @@ const headerAvatar: SxProps<Theme> = {
 };
 
 const footer: SxProps<Theme> = {
-  width: '80%',
+  width: '100%',
   height: '3%',
   // minHeight: '55px',
   backgroundColor: 'white',
@@ -180,6 +180,8 @@ const footer: SxProps<Theme> = {
   padding: '20px',
   color: 'black',
   fontFamily: '"Open Sans",sans-serif !important',
+  marginBottom: 2,
+  marginTop: 2
 };
 
 const fixHeader: SxProps<Theme> = {
@@ -187,7 +189,51 @@ const fixHeader: SxProps<Theme> = {
   marginTop: 5 
 }
 
+// Surat
+
+const page: SxProps<Theme> = {
+  padding: 30,
+    fontSize: 11,
+    fontFamily: "Arial",
+}
+
+const headerSurat: SxProps<Theme> = {
+  textAlign: "center",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 10,
+}
+
+const subHeader: SxProps<Theme> = {
+  textAlign: "center",
+    fontSize: 12,
+    marginBottom: 20,
+}
+
+const section: SxProps<Theme> = {
+  marginBottom: 8,
+}
+
+const bold: SxProps<Theme> = {
+  fontWeight: "bold",
+}
+
+const underline: SxProps<Theme> = {
+  textDecoration: "underline",
+}
+
+const ketentuan: SxProps<Theme> = {
+  marginTop: 15,
+}
+
 export const layoutPrivateStyle = {
+  page,
+  headerSurat,
+  subHeader,
+  section,
+  bold,
+  underline,
+  ketentuan,
   buttonAdd,
   buttonCancel,
   buttonSubmit,

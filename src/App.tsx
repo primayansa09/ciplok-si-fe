@@ -27,6 +27,7 @@ import { DetailApproval } from "./pages/approval/DetailApproval";
 import { RequireAuth } from "./routes/RequireAuth";
 import { KriteriadanSubKriteria } from "./pages/kriteria-dans-subkriteria";
 import { ManageKriteriadanSubKriteria } from "./pages/kriteria-dans-subkriteria/ManageKriteriadanSubKriteria";
+import { Dashboard } from "./pages/dashboard/Dashboard";
 
 function App() {
   const dispatch = useDispatch();
@@ -48,6 +49,7 @@ function App() {
             <Route element={<RequireAuth />}>
               <Route path="/" element={<Navigate to="/master-data/data-majelis" replace />} />
               <Route path="/master-data/data-majelis" element={<DataMajelis />} />
+              <Route path="/dashboard" element={<Dashboard/>} />
               <Route path="/master-data/data-jemaat" element={<DataJemaat />} />
               <Route path="/master-data/data-kegiatan" element={<DataKegiatan />} />
               <Route path="/master-data/data-ruangan" element={<DataRuangan />} />
