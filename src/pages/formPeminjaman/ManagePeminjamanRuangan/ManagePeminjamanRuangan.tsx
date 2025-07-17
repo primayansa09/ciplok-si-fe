@@ -33,13 +33,17 @@ import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchAnggotaKomisi } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
 import { Criteria, CriteriaData, DataInsert, DataMJ, DetailData, initialCriteriaDetails } from "../../../store/formPeminjaman/type";
-import { fetchDataCriteriaRequest, fetchDataMajelis } from "../../../api/dataRequestForm";
+import { createFormRequest, fetchDataCriteriaRequest, fetchDataMajelis } from "../../../api/dataRequestForm";
 import { fetchDataCriteria } from "../../../api/dataCriteria";
+import MessageModal from "../../../components/Modal/MessageModal";
 
 export function ManagePeminjamanRuangan() {
   const navigate = useNavigate();
   const [majelisData, setMajelisData] = useState<DataMJ[]>([]);
   const [ruangan, setRuangan] = useState<DataSettings[]>([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [redirectTo, setRedirectTo] = useState("");
   const [jemaatPeminjam, setJemaatPeminjam] = React.useState("");
   const location = useLocation();
   const { itemData, mode, IsEdit } = location.state || {};
@@ -59,7 +63,7 @@ export function ManagePeminjamanRuangan() {
   };
 
   const [formPeminjaman, setFormPeminjaman] = useState<DataInsert>({
-    transactionID: "",
+    transactionID: 0,
     status: "",
     startTime: "",
     roomName: "",
@@ -88,9 +92,6 @@ export function ManagePeminjamanRuangan() {
     deskripsi: false,
   });
 
-  const handleSubmit = () => {
-  };
-
   useEffect(() => {
     if (IsEdit && itemData) {
       setFormPeminjaman(itemData);
@@ -112,10 +113,6 @@ export function ManagePeminjamanRuangan() {
     const loadData = async () => {
       try {
         const response = await fetchDataCriteriaRequest();
-        // setFormPeminjaman(prev => ({
-        //   ...prev,
-        //   subCriteriaList: response
-        // }));
         setCriteriaData(response)
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -148,6 +145,9 @@ export function ManagePeminjamanRuangan() {
     if (!selectedSubData) return;
 
     const newDetail = {
+      criteriaName: criteria.criteriaName,
+      criteriaCode: criteria.criteriaCode,
+      bobot: criteria.bobot,
       criteriaID: criteria.idHeaderCriteria,
       subCriteriaID: selectedSubData.idSubCriteria.toString(),
       subCriteriaName: selectedSubData.subCriteriaName,
@@ -172,8 +172,66 @@ export function ManagePeminjamanRuangan() {
     }));
   };
 
+  const handleSubmit = async () => {
 
+    try {
+      let response;
+      console.log(formPeminjaman)
+      if (formPeminjaman.transactionID === 0 || formPeminjaman.transactionID === null) {
+        response = await createFormRequest(formPeminjaman);
+        if (response.statusCode === 200) {
+          setFormPeminjaman({
+            transactionID: 0,
+            status: "",
+            startTime: "",
+            roomName: "",
+            reservationDate: new Date(),
+            createdDate: new Date(),
+            createdBy: "",
+            description: "",
+            mjRequest: "",
+            mjMengetahui: "",
+            subCriteriaList: []
+          });
+          setModalMessage(response.message || "Data created successfully!");
+          setRedirectTo("/kriteria-sub-kriteria");
+          setOpenModal(true);
+        }
+      } else {
+        // response = await editDataCriteria(formKriteria.idHeaderCriteria, formKriteria);
+        // if (response.statusCode === 200) {
+        //  setFormPeminjaman({
+        //   transactionID: "",
+        //   status: "",
+        //   startTime: "",
+        //   roomName: "",
+        //   reservationDate: new Date(),
+        //   createdDate: new Date(),
+        //   createdBy: "",
+        //   description: "",
+        //   mjRequest: "",
+        //   mjMengetahui: "",
+        //   subCriteriaList: []
+        // });
+        // setModalMessage(response.message || "Data updated successfully!");
+        setRedirectTo("/kriteria-sub-kriteria");
+        setOpenModal(true);
+        // }
+      }
+    } catch (ex) {
+      setModalMessage("An error occurred while submitting the form.");
+      setOpenModal(true);
+    }
+  }
 
+  const closeModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);
+    navigate(redirectTo, { replace: true });
+  };
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -223,7 +281,24 @@ export function ManagePeminjamanRuangan() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["TimePicker"]}>
                 <TimePicker
+                  ampm={false} // ✅ 24-hour format
                   label=""
+                  minutesStep={60} // ✅ hanya tampil tiap 60 menit (1 jam)
+                  value={
+                    formPeminjaman.startTime
+                      ? dayjs(formPeminjaman.startTime, "HH:mm")
+                      : null
+                  }
+                  onChange={(value) => {
+                    if (value) {
+                      const onlyHour = value.hour();
+                      const formatted = dayjs().hour(onlyHour).minute(0).format("HH:mm"); // force menit ke 00
+                      setFormPeminjaman((prev) => ({
+                        ...prev,
+                        startTime: formatted, // ex: "13:00"
+                      }));
+                    }
+                  }}
                   slotProps={{
                     textField: {
                       size: "small",
@@ -287,11 +362,11 @@ export function ManagePeminjamanRuangan() {
               id="demo-simple-select"
               style={{ width: "100%" }}
               size="small"
-              value={formPeminjaman.mjMengetahui}
+              value={formPeminjaman.mjRequest}
               onChange={(e) =>
                 setFormPeminjaman({
                   ...formPeminjaman,
-                  mjMengetahui: e.target.value,
+                  mjRequest: e.target.value,
                 })
               }
             >
@@ -357,8 +432,7 @@ export function ManagePeminjamanRuangan() {
             </Grid>
           </Grid>
         )}
-
-        <Grid container spacing={1} alignItems={"center"} marginTop={2}>
+        {IsEdit && (<Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
             <Button
               type="submit"
@@ -379,9 +453,11 @@ export function ManagePeminjamanRuangan() {
               </span>
             </Button>
           </Grid>
-        </Grid>
+        </Grid>)
+        }
 
-        <Grid container spacing={2} alignItems={"center"} marginTop={2}>
+
+        < Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={12}>
             <InputLabel
               sx={{
@@ -394,6 +470,7 @@ export function ManagePeminjamanRuangan() {
             <TextField
               id="outlined-basic"
               variant="outlined"
+              // value={formPeminjaman.description}
               fullWidth
               multiline
               rows={10}
@@ -406,13 +483,13 @@ export function ManagePeminjamanRuangan() {
                   alignItems: "flex-start",
                 },
               }}
-            //   value={formDataKegiatan.deskripsiKegiatan}
-            //   onChange={(e) =>
-            //     setFormDataKegiatan({
-            //       ...formDataKegiatan,
-            //       deskripsiKegiatan: e.target.value,
-            //     })
-            //   }
+              value={formPeminjaman.description}
+              onChange={(e) =>
+                setFormPeminjaman({
+                  ...formPeminjaman,
+                  description: e.target.value,
+                })
+              }
             />
           </Grid>
         </Grid>
@@ -505,6 +582,13 @@ export function ManagePeminjamanRuangan() {
             >
               Submit
             </Button>
+            <MessageModal
+              open={openModal}
+              onClose={closeModal}
+              onConfirm={handleModalConfirm}
+              message={modalMessage}
+              redirectTo={redirectTo}
+            />
           </Grid>
           <Grid size={2}>
             <Button
@@ -518,6 +602,6 @@ export function ManagePeminjamanRuangan() {
           </Grid>
         </Grid>
       </Paper>
-    </Stack>
+    </Stack >
   );
 }

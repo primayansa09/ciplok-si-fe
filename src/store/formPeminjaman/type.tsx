@@ -10,14 +10,16 @@ export type DataFilter = {
 };
 
 export type Data = {
-    id: string;
-    tanggalPemakaian: string | null;
-    tanggalPengajuan: string | null;
-    jamMulaiPemakaian: string | null;
-    jumlahOrang: string | null;
-    mjMengetahui: string | null;
-    jemaatPeminjam: string | null;
-    deskripsi: string | null;
+    transactionID: number;
+    status: string | null;
+    roomName: string | null;
+    reservationDate: string | null;
+    reservationDateString: string | null;
+    description: string;
+    mjRequest: string;
+    createdBy: string;
+    createdDate:string;
+    startTime:string;
 };
 
 export type DataMJ = {
@@ -32,7 +34,7 @@ export type DataMJ = {
 };
 
 export type DataInsert = {
-    transactionID: string;
+    transactionID: number;
     status: string | null;
     startTime: string | null;
     roomName: string | null;
@@ -101,19 +103,19 @@ export type ScoreData = {
 
 
 export type SubCriteria = {
-  idSubCriteria: number;
-  idCriteria: number;
-  subCriteriaName: string;
-  subCriteriaBobot: number;
+    idSubCriteria: number;
+    idCriteria: number;
+    subCriteriaName: string;
+    subCriteriaBobot: number;
 };
 
 export type Criteria = {
-  idHeaderCriteria: number;
-  criteriaName: string;
-  bobot: number;
-  parameter: string;
-  criteriaCode: string;
-  subCriteriaList: SubCriteria[];
+    idHeaderCriteria: number;
+    criteriaName: string;
+    bobot: number;
+    parameter: string;
+    criteriaCode: string;
+    subCriteriaList: SubCriteria[];
 };
 
 export interface DataApproval {

@@ -23,56 +23,17 @@ import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import HeaderSection from "../../../components/commponentHeader/Header";
+import { fetchRequestData } from "../../../api/dataRequestForm";
 
 export function DefaultPeminjamanRuangan() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const dataDummyPeminjaman = [
-    {
-      tanggalPemakaian: "12 Apr 2025",
-      jam: "10.00",
-      ruangan: "F9 RSG Konsis F9 F9 F9 Gereja Gereja F9 F9",
-      jenisKegiatan:
-        "Latihan ibadah KP Persiapan GSM Rapat BCRC Regen Band Regen Gitar Latihan Angeloudi Dekor Pentakosta Panda Latihan ibadah KP",
-      peminjam:
-        "Komisi Pemuda Komisi Anak Komisi Remaja Komisi Remaja Komisi Remaja Komisi Anak Jemaat Jemaat Komisi Pemuda",
-      jemaatPeminjam: "Wening Evy Jemima Anya Viola Julia Maria Hein Wening",
-      tanggalPengajuan: "10 Apr 2025",
-      status: "approve",
-    },
-    {
-      tanggalPemakaian: "12 Apr 2025",
-      jam: "10.00",
-      ruangan: "F9 RSG Konsis F9 F9 F9 Gereja Gereja F9 F9",
-      jenisKegiatan:
-        "Latihan ibadah KP Persiapan GSM Rapat BCRC Regen Band Regen Gitar Latihan Angeloudi Dekor Pentakosta Panda Latihan ibadah KP",
-      peminjam:
-        "Komisi Pemuda Komisi Anak Komisi Remaja Komisi Remaja Komisi Remaja Komisi Anak Jemaat Jemaat Komisi Pemuda",
-      jemaatPeminjam: "Wening Evy Jemima Anya Viola Julia Maria Hein Wening",
-      tanggalPengajuan: "10 Apr 2025",
-      status: "processing",
-    },
-    {
-      tanggalPemakaian: "12 Apr 2025",
-      jam: "10.00",
-      ruangan: "F9 RSG Konsis F9 F9 F9 Gereja Gereja F9 F9",
-      jenisKegiatan:
-        "Latihan ibadah KP Persiapan GSM Rapat BCRC Regen Band Regen Gitar Latihan Angeloudi Dekor Pentakosta Panda Latihan ibadah KP",
-      peminjam:
-        "Komisi Pemuda Komisi Anak Komisi Remaja Komisi Remaja Komisi Remaja Komisi Anak Jemaat Jemaat Komisi Pemuda",
-      jemaatPeminjam: "Wening Evy Jemima Anya Viola Julia Maria Hein Wening",
-      tanggalPengajuan: "10 Apr 2025",
-      status: "reject",
-    },
-  ];
-
-  const [dataBind, setDataBind] = useState({ data: dataDummyPeminjaman });
+  const [dataBind, setDataBind] = useState<Data[]>([]);
+  const [filteredData, setFilteredData] = useState<Data[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
-
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -107,11 +68,25 @@ export function DefaultPeminjamanRuangan() {
   };
 
   useEffect(() => {
-      const filtered = dataBind.data.filter((item: any) =>
-        item.peminjam?.toLowerCase().includes(searchData.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }, [searchData, dataBind.data]);
+    const loadData = async () => {
+      try {
+        const response = await fetchRequestData();
+        if (response.statusCode === 200) {
+          setDataBind(response.data);
+          setFilteredData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    loadData();
+  }, []);
+  useEffect(() => {
+    const filtered = dataBind.filter((item: Data) =>
+      item.createdBy?.toLowerCase().includes(searchData.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [searchData, dataBind]);
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -192,26 +167,7 @@ export function DefaultPeminjamanRuangan() {
                 >
                   Ruangan
                 </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Jenis Kegiatan
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Peminjam
-                </TableCell>
+
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -256,10 +212,10 @@ export function DefaultPeminjamanRuangan() {
             </TableHead>
             <TableBody sx={{ border: 1 }}>
               {filteredData.length > 0 ? (
-                filteredData
-                  .map((ex: any, index) => (
+                filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((ex: Data, index) => (
                     <TableRow
-                      // key={ex.tanggalPemakaian}
+                      key={ex.transactionID}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -267,7 +223,7 @@ export function DefaultPeminjamanRuangan() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.tanggalPemakaian}
+                        {ex.reservationDateString}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -275,7 +231,7 @@ export function DefaultPeminjamanRuangan() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.jam}
+                        {ex.startTime}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -283,7 +239,16 @@ export function DefaultPeminjamanRuangan() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.ruangan}
+                        {ex.roomName}
+                      </TableCell>
+
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {ex.createdBy}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -291,7 +256,7 @@ export function DefaultPeminjamanRuangan() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.jenisKegiatan}
+                        {ex.createdDate}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -299,35 +264,11 @@ export function DefaultPeminjamanRuangan() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.peminjam}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.jemaatPeminjam}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.tanggalPengajuan}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.status === "approve" ? (
+                        {ex.status === "Approve" ? (
                           <DoneIcon style={{ color: "green" }} />
                         ) : ex.status === "reject" ? (
                           <CloseIcon style={{ color: "red" }} />
-                        ) : ex.status === "processing" ? (
+                        ) : ex.status === "Pending" ? (
                           <PendingActionsIcon style={{ color: "red" }} />
                         ) : (
                           "-"
@@ -373,7 +314,7 @@ export function DefaultPeminjamanRuangan() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
+            count={filteredData.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
