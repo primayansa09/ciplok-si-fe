@@ -33,6 +33,8 @@ export function DefaultKriteriadanSubKriteria() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
+  const [totalData, setTotalData] = useState(0);
+
   const [filteredData, setFilteredData] = useState<Data[]>([]);
 
   const handleChangePage = (
@@ -82,10 +84,11 @@ export function DefaultKriteriadanSubKriteria() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchDataCriteria();
+        const response = await fetchDataCriteria(page, rowsPerPage);
         if (response.statusCode === 200) {
           setDataBind(response.data);
           setFilteredData(response.data);
+          setTotalData(response.totalData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -196,80 +199,78 @@ export function DefaultKriteriadanSubKriteria() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {filteredData.length > 0 ? (
-                filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex: any) => (
-                    <TableRow
-                      key={ex.criteriaCode}
+              {dataBind.length > 0 ? (
+                dataBind.map((ex: any) => (
+                  <TableRow
+                    key={ex.criteriaCode}
+                    sx={{
+                      "&:last-child td, &:last-child th": {
+                        border: 0,
+                      },
+                    }}
+                  >
+                    <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                      {ex.criteriaCode}
+                    </TableCell>
+                    <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                      {ex.criteriaName}
+                    </TableCell>
+                    <TableCell
                       sx={{
-                        "&:last-child td, &:last-child th": {
-                          border: 0,
-                        },
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
                       }}
                     >
-                      <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
-                        {ex.criteriaCode}
-                      </TableCell>
-                      <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
-                        {ex.criteriaName}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
+                      {ex.bobot}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.parameter}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="center"
+                        gap={1}
                       >
-                        {ex.bobot}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.parameter}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        <Box
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="center"
-                          gap={1}
+                        <InputLabel
+                          onClick={() => clickEditData(ex)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
+                            marginBottom: "5px",
+                          }}
                         >
-                          <InputLabel
-                            onClick={() => clickEditData(ex)}
-                            sx={{
-                              ...layoutPrivateStyle.manageTitleAction,
-                              cursor: "pointer",
-                              marginBottom: "5px",
-                            }}
-                          >
-                            <EditIcon />
-                          </InputLabel>
-                          <InputLabel
-                            onClick={() => setOpen(true)}
-                            sx={{
-                              ...layoutPrivateStyle.manageTitleAction,
-                              cursor: "pointer",
-                            }}
-                          >
-                            <DeleteIcon />
-                          </InputLabel>
-                          <ConfirmDeleteModal
-                            open={open}
-                            onClose={() => setOpen(false)}
-                            onConfirm={handleDelete}
-                          />
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                          <EditIcon />
+                        </InputLabel>
+                        <InputLabel
+                          onClick={() => setOpen(true)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
+                          }}
+                        >
+                          <DeleteIcon />
+                        </InputLabel>
+                        <ConfirmDeleteModal
+                          open={open}
+                          onClose={() => setOpen(false)}
+                          onConfirm={handleDelete}
+                        />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
                   <TableCell colSpan={8} align="center">
@@ -284,12 +285,12 @@ export function DefaultKriteriadanSubKriteria() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.length}
+            count={totalData}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50]}
+            rowsPerPageOptions={[10, 25, 50]}
             labelRowsPerPage="Showing"
           />
         </Box>

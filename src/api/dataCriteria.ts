@@ -3,11 +3,11 @@ import { ApiCriteria } from "../constants/apiCriteria";
 import { Data, DataInsert } from "../store/kriteriaSubKriteria/type";
 import { ApiResponse } from "../types/response";
 
-export const fetchDataCriteria = async (): Promise<ApiResponse<Data[]>> => {
+export const fetchDataCriteria = async (page: number, pageSize: number): Promise<ApiResponse<Data[]>> => {
   try {
-    const response = await apiClient.post<ApiResponse<Data[]>>(ApiCriteria.getData);
+    const response = await apiClient.post<ApiResponse<Data[]>>(`${ApiCriteria.getData}?${page + 1}&pageSize=${pageSize}`);
     if (response.data.statusCode === 200) {
-      return response.data; 
+      return response.data;
     } else {
       console.error(`Error: ${response.data.message}`);
       return {
