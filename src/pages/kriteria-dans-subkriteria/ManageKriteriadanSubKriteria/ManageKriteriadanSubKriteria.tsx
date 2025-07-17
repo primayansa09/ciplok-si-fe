@@ -36,8 +36,8 @@ export function ManageKriteriadanSubKriteria() {
   const location = useLocation();
 
   const [dataDummyNilai, setDataDummyNilai] = useState<any[]>([
-    { id: 1, value: "Maksimum" },
-    { id: 0, value: "Minimum" },
+    { id: "Maksimal", value: "Maksimal" },
+    { id: "Minimal", value: "Minimal" },
   ]);
 
   const { itemData, mode, IsEdit } = location.state || {};
@@ -62,8 +62,8 @@ export function ManageKriteriadanSubKriteria() {
   const handleSubmit = async () => {
     const newErrors = {
       criteriaName: (formKriteria.criteriaName ?? "").trim() === "",
-      bobot: (formKriteria.bobot ?? "").trim() === "",
-      parameter: (formKriteria.parameter ?? "").trim() === "",
+      bobot: String(formKriteria.bobot ?? "").trim() === "",
+      parameter: String(formKriteria.parameter ?? "").trim() === "",
     };
 
     setErrors(newErrors);
@@ -76,6 +76,7 @@ export function ManageKriteriadanSubKriteria() {
 
     try {
       let response;
+      console.log(formKriteria)
       if (formKriteria.idHeaderCriteria == 0 || formKriteria.idHeaderCriteria === null) {
         response = await createDataCriteria(formKriteria);
         if (response.statusCode === 200) {
@@ -119,8 +120,10 @@ export function ManageKriteriadanSubKriteria() {
         ...itemData,
         parameter: itemData.parameter || "",
       });
+      // setDataDummyNilai(itemData.parameter)
     }
-  }, [IsEdit, itemData]);
+  }, [IsEdit, itemData, dataDummyNilai]);
+
 
   const clickCancel = () => {
     navigate("/kriteria-sub-kriteria", { replace: true });

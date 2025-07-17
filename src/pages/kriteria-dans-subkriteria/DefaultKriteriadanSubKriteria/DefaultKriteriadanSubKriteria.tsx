@@ -228,7 +228,7 @@ export function DefaultKriteriadanSubKriteria() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.parameter ? "Maksimal" : "Minimal"}
+                        {ex.parameter}
                       </TableCell>
                       <TableCell
                         sx={{
