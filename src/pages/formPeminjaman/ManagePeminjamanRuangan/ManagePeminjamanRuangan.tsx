@@ -32,8 +32,9 @@ import VerticalAlignBottomIcon from "@mui/icons-material/VerticalAlignBottom";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchAnggotaKomisi } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
-import { DataMJ } from "../../../store/formPeminjaman/type";
-import { fetchDataMajelis } from "../../../api/dataRequestForm";
+import { Criteria, CriteriaData, DataInsert, DataMJ, DetailData, initialCriteriaDetails } from "../../../store/formPeminjaman/type";
+import { fetchDataCriteriaRequest, fetchDataMajelis } from "../../../api/dataRequestForm";
+import { fetchDataCriteria } from "../../../api/dataCriteria";
 
 export function ManagePeminjamanRuangan() {
   const navigate = useNavigate();
@@ -57,19 +58,21 @@ export function ManagePeminjamanRuangan() {
     setSelectedValue(value);
   };
 
-  const [formPeminjaman, setFormPeminjaman] = useState({
-    peminjam: "",
-    jenisKegiatan: "",
-    ruangan: "",
-    durasi: "",
-    tanggalPemakaian: "",
-    tanggalPengajuan: "",
-    jamMulaiPemakaian: "",
-    jumlahOrang: "",
+  const [formPeminjaman, setFormPeminjaman] = useState<DataInsert>({
+    transactionID: "",
+    status: "",
+    startTime: "",
+    roomName: "",
+    reservationDate: new Date(),
+    createdDate: new Date(),
+    createdBy: "",
+    description: "",
+    mjRequest: "",
     mjMengetahui: "",
-    jemaatPeminjam: "",
-    deskripsi: "",
+    subCriteriaList: []
   });
+
+  const [criteriaData, setCriteriaData] = useState<Criteria[]>();
 
   const [errors, setErrors] = useState({
     peminjam: false,
@@ -86,27 +89,6 @@ export function ManagePeminjamanRuangan() {
   });
 
   const handleSubmit = () => {
-    const newErrors = {
-      peminjam: formPeminjaman.peminjam.trim() === "",
-      jenisKegiatan: formPeminjaman.jenisKegiatan.trim() === "",
-      ruangan: formPeminjaman.ruangan.trim() === "",
-      durasi: formPeminjaman.durasi.trim() === "",
-      tanggalPemakaian: formPeminjaman.tanggalPemakaian.trim() === "",
-      tanggalPengajuan: formPeminjaman.tanggalPengajuan.trim() === "",
-      jamMulaiPemakaian: formPeminjaman.jamMulaiPemakaian.trim() === "",
-      jumlahOrang: formPeminjaman.jumlahOrang.trim() === "",
-      mjMengetahui: formPeminjaman.mjMengetahui.trim() === "",
-      jemaatPeminjam: formPeminjaman.jemaatPeminjam.trim() === "",
-      deskripsi: formPeminjaman.deskripsi.trim() === "",
-    };
-
-    setErrors(newErrors);
-
-    const isValid = !Object.values(newErrors).includes(true);
-
-    if (!isValid) {
-      return;
-    }
   };
 
   useEffect(() => {
@@ -114,6 +96,7 @@ export function ManagePeminjamanRuangan() {
       setFormPeminjaman(itemData);
     }
   }, [IsEdit, itemData]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,7 +109,23 @@ export function ManagePeminjamanRuangan() {
       setMajelisData(response.data)
     }
     fetchDataMJ();
+    const loadData = async () => {
+      try {
+        const response = await fetchDataCriteriaRequest();
+        // setFormPeminjaman(prev => ({
+        //   ...prev,
+        //   subCriteriaList: response
+        // }));
+        setCriteriaData(response)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    loadData();
   }, []);
+
+  useEffect(() => { }, [criteriaData])
 
 
   const clickCancel = () => {
@@ -137,21 +136,42 @@ export function ManagePeminjamanRuangan() {
     setTanggalPemakaian(newValue);
   };
 
-  const handleTanggalPengajuan = (newValue: Dayjs | null) => {
-    setTanggalPengajuan(newValue);
+
+  const handleSubCriteriaChange = (
+    criteria: Criteria,
+    selectedSubCriteriaID: number
+  ) => {
+    const selectedSubData = criteria.subCriteriaList.find(
+      (s) => s.idSubCriteria === selectedSubCriteriaID
+    );
+
+    if (!selectedSubData) return;
+
+    const newDetail = {
+      criteriaID: criteria.idHeaderCriteria,
+      subCriteriaID: selectedSubData.idSubCriteria.toString(),
+      subCriteriaName: selectedSubData.subCriteriaName,
+      subCriteriaBobot: selectedSubData.subCriteriaBobot,
+      parameter: criteria.parameter === "Maksimal",
+    };
+
+    const updated = [...formPeminjaman.subCriteriaList];
+    const existingIndex = updated.findIndex(
+      (item) => item.criteriaID === criteria.idHeaderCriteria
+    );
+
+    if (existingIndex !== -1) {
+      updated[existingIndex] = newDetail;
+    } else {
+      updated.push(newDetail);
+    }
+
+    setFormPeminjaman((prev) => ({
+      ...prev,
+      subCriteriaList: updated,
+    }));
   };
 
-  // const handleMj = (event: SelectChangeEvent) => {
-  //   setMj(event.target.value as string);
-  // };
-
-  // const handleRuangan = (event: SelectChangeEvent) => {
-  //   setRuangan(event.target.value as string);
-  // };
-
-  const handleJemaatPeminjam = (event: SelectChangeEvent) => {
-    setJemaatPeminjam(event.target.value as string);
-  };
 
 
 
@@ -233,11 +253,11 @@ export function ManagePeminjamanRuangan() {
               id="demo-simple-select"
               style={{ width: "100%" }}
               size="small"
-              value={formPeminjaman.ruangan}
+              value={formPeminjaman.roomName}
               onChange={(e) =>
                 setFormPeminjaman({
                   ...formPeminjaman,
-                  ruangan: e.target.value,
+                  roomName: e.target.value,
                 })
               }
             >
@@ -427,227 +447,45 @@ export function ManagePeminjamanRuangan() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              <TableRow
-                sx={{
-                  "&:last-child td, &:last-child th": {
-                    border: 0,
-                  },
-                }}
-              >
-                <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={"Peminjam"}
-                  // onChange={(e) => {
-                  //   const newDetails = [...formKriteria.kriteriaDetails];
-                  //   newDetails[index].bobot = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: newDetails,
-                  //   });
-                  // }}
-                  />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    textAlign: "center",
-                  }}
-                >
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    fullWidth
-                    size="small"
-                  // value={row.namaSubKriteria}
-                  // onChange={(e) => {
-                  //   const updated = [...formKriteria.kriteriaDetails];
-                  //   updated[index].namaSubKriteria = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: updated,
-                  //   });
-                  // }}
-                  //   error={errors.nilai}
-                  >
-                    {/* {dataDummy.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.peminjam}
+              {criteriaData?.map((criteria, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                    <TextField
+                      id={`criteria-${index}`}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={criteria.criteriaName}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ ...layoutPrivateStyle.manageTableCell, textAlign: "center" }}>
+                    <Select
+                      value={
+                        formPeminjaman.subCriteriaList.find(
+                          (item) => item.criteriaID === criteria.idHeaderCriteria
+                        )?.subCriteriaID ?? ""
+                      }
+                      size="small"
+                      onChange={(e) => handleSubCriteriaChange(criteria, Number(e.target.value))}
+                      displayEmpty
+                      style={{ width: "100%" }}
+                    >
+                      <MenuItem disabled value="">
+                        Pilih Sub Kriteria
                       </MenuItem>
-                    ))} */}
-                  </Select>
-                </TableCell>
-              </TableRow>
-              <TableRow
-                sx={{
-                  "&:last-child td, &:last-child th": {
-                    border: 0,
-                  },
-                }}
-              >
-                <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={"Jenis Kegiatan"}
-                  // onChange={(e) => {
-                  //   const newDetails = [...formKriteria.kriteriaDetails];
-                  //   newDetails[index].bobot = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: newDetails,
-                  //   });
-                  // }}
-                  />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    textAlign: "center",
-                  }}
-                >
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    fullWidth
-                    size="small"
-                  // value={"Nama Sub Kriteria *"}
-                  // onChange={(e) => {
-                  //   const updated = [...formKriteria.kriteriaDetails];
-                  //   updated[index].namaSubKriteria = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: updated,
-                  //   });
-                  // }}
-                  //   error={errors.nilai}
-                  >
-                    {/* {dataDummy.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.jenisKegiatan}
-                      </MenuItem>
-                    ))} */}
-                  </Select>
-                </TableCell>
-              </TableRow>
-              <TableRow
-                sx={{
-                  "&:last-child td, &:last-child th": {
-                    border: 0,
-                  },
-                }}
-              >
-                <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={"Durasi"}
-                  // onChange={(e) => {
-                  //   const newDetails = [...formKriteria.kriteriaDetails];
-                  //   newDetails[index].bobot = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: newDetails,
-                  //   });
-                  // }}
-                  />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    textAlign: "center",
-                  }}
-                >
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    size="small"
-                    fullWidth
-                  // value={row.namaSubKriteria}
-                  // onChange={(e) => {
-                  //   const updated = [...formKriteria.kriteriaDetails];
-                  //   updated[index].namaSubKriteria = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: updated,
-                  //   });
-                  // }}
-                  //   error={errors.nilai}
-                  >
-                    {/* {dataDummyDurasi.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.durasi}
-                      </MenuItem>
-                    ))} */}
-                  </Select>
-                </TableCell>
-              </TableRow>
-              <TableRow
-                sx={{
-                  "&:last-child td, &:last-child th": {
-                    border: 0,
-                  },
-                }}
-              >
-                <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={"Rutin"}
-                  // onChange={(e) => {
-                  //   const newDetails = [...formKriteria.kriteriaDetails];
-                  //   newDetails[index].bobot = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: newDetails,
-                  //   });
-                  // }}
-                  />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    textAlign: "center",
-                  }}
-                >
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    size="small"
-                    fullWidth
-                  // value={row.namaSubKriteria}
-                  // onChange={(e) => {
-                  //   const updated = [...formKriteria.kriteriaDetails];
-                  //   updated[index].namaSubKriteria = e.target.value;
-                  //   setFormKriteria({
-                  //     ...formKriteria,
-                  //     kriteriaDetails: updated,
-                  //   });
-                  // }}
-                  //   error={errors.nilai}
-                  >
-                    {/* {dataDummyRutin.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.rutin}
-                      </MenuItem>
-                    ))} */}
-                  </Select>
-                  {/* {errors.nilai && (
-                              <FormHelperText>
-                                {errors.nilai || "Nilai Wajib diisi"}
-                              </FormHelperText>
-                            )} */}
-                </TableCell>
-              </TableRow>
+
+                      {criteria.subCriteriaList.map((sub) => (
+                        <MenuItem key={sub.idSubCriteria} value={sub.idSubCriteria}>
+                          {sub.subCriteriaName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

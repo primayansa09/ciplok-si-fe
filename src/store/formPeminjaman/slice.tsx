@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { DataApproval, DataResponse } from "./type";
+import { DataApproval } from "./type";
 import { ApprovalAPI } from "../../constants/apiApproval";
 import apiClient from "../../config/api-client";
 import { ApiResponse } from "../../types/response";

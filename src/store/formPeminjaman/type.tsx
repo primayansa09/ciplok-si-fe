@@ -1,15 +1,3 @@
-import { type } from "os";
-
-
-
-export type DataResponse = {
-    result?: boolean;
-    message?: string;
-    data: {
-        data: Data[]; // Update this line to match the structure of your API response
-        totalData: number;
-    };
-};
 
 export type DataFilter = {
     filter: {
@@ -54,19 +42,41 @@ export type DataInsert = {
     description: string | null;
     mjRequest: string | null;
     mjMengetahui: string | null;
-    details: DetailData[];
+    subCriteriaList: DetailData[];
 };
 
 export type DetailData = {
-  criteriaCode: string;
-  criteriaName: string;
-  criteriaID:number;
-  subCriteriaID:number;
-  bobot:number;
-  subCriteriaName:string;
-  subCriteriaBobot:number;
-  parameter:boolean;
+    criteriaID: number;
+    subCriteriaID: string;
+    subCriteriaName: string;
+    subCriteriaBobot: number;
+    selectedSubCriteriaID?: number;
 };
+
+export const initialCriteriaDetails: CriteriaData[] = [
+    {
+        idCriteria: 0,
+        criteriaCode: "",
+        criteriaName: "",
+        bobot: 0,
+        parameter: "",
+        subCriteriaID: "",
+        subCriteriaName: "",
+        subCriteriaBobot: 0
+
+    },
+];
+
+export type CriteriaData = {
+    idCriteria: number;
+    criteriaCode: string;
+    criteriaName: string;
+    bobot: number;
+    parameter: string;
+    subCriteriaID: string;
+    subCriteriaName: string;
+    subCriteriaBobot: number;
+}
 
 export type ReservationData = {
     transactionID: number;
@@ -83,16 +93,28 @@ export type ReservationData = {
 
 export type ScoreData = {
     transactionID: number;
-    tanggalPengajuan:string;
-    recommendationStatus:string;
-    finalScore:string;
+    tanggalPengajuan: string;
+    recommendationStatus: string;
+    finalScore: string;
 
 };
 
-export type ValidateError = {
-    codePenatua: boolean;
-    namaPenatua: boolean;
-}
+
+export type SubCriteria = {
+  idSubCriteria: number;
+  idCriteria: number;
+  subCriteriaName: string;
+  subCriteriaBobot: number;
+};
+
+export type Criteria = {
+  idHeaderCriteria: number;
+  criteriaName: string;
+  bobot: number;
+  parameter: string;
+  criteriaCode: string;
+  subCriteriaList: SubCriteria[];
+};
 
 export interface DataApproval {
     reservationDate: Date;

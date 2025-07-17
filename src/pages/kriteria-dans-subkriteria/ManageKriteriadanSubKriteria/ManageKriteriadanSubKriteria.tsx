@@ -121,8 +121,20 @@ export function ManageKriteriadanSubKriteria() {
         parameter: itemData.parameter || "",
       });
       // setDataDummyNilai(itemData.parameter)
+    } else {
+      setFormKriteria({
+        ...formKriteria,
+        subCriteriaList: [
+          {
+            ...initialCriteriaDetails[0],
+            subCriteriaName: "",
+            subCriteriaBobot:null
+          },
+          ...initialCriteriaDetails.slice(1), // sisanya tetap
+        ],
+      });
     }
-  }, [IsEdit, itemData, dataDummyNilai]);
+  }, [IsEdit, itemData, dataDummyNilai,]);
 
 
   const clickCancel = () => {

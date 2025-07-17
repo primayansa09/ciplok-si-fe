@@ -1,7 +1,8 @@
 import apiClient from "../config/api-client";
+import { ApiCriteria } from "../constants/apiCriteria";
 import { DataMajelisAPI } from "../constants/apiDataMajelis";
 import { RequestFormAPI } from "../constants/apiRequestForm";
-import { Data, DataInsert, DataMJ } from "../store/formPeminjaman/type";
+import { Criteria, CriteriaData, Data, DataInsert, DataMJ } from "../store/formPeminjaman/type";
 import { ApiResponse } from "../types/response";
 
 export const fetchRequestData = async (): Promise<ApiResponse<Data[]>> => {
@@ -81,5 +82,23 @@ export const fetchDataMajelis = async (): Promise<ApiResponse<DataMJ[]>> => {
       totalData: 0,
       totalPages: 1,
     };
+  }
+};
+
+export const fetchDataCriteriaRequest = async () => {
+  try {
+    const response = await apiClient.post<Criteria[]>(
+      `${ApiCriteria.getDataCritList}`
+    );
+    console.log(response.data)
+    if (response.data.length > 0) {
+      return response.data;
+    } else {
+      console.error(`Error: ${response.data}`);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching anggotaKomisi:", error);
+    return [];
   }
 };
