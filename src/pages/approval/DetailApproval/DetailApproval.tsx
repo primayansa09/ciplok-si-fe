@@ -16,9 +16,10 @@ import {
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import DoneIcon from "@mui/icons-material/Done";
+import CancelIcon from '@mui/icons-material/Cancel';
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchApprovalByDate } from "../../../api/dataApproval";
-import { ReservationData, ScoreData,  } from "../../../store/formPeminjaman/type";
+import { ReservationData, ScoreData, } from "../../../store/formPeminjaman/type";
 
 export function DetailApproval() {
   const navigate = useNavigate();
@@ -136,6 +137,16 @@ export function DetailApproval() {
     console.log(headers)
     console.log(headersScore)
   }, [dataBind])
+
+
+  const handleApprovalClick = (action: "approve" | "reject", rowData: number) => {
+    if (action === "approve") {
+      console.log("Approved:", rowData);
+    } else if (action === "reject") {
+      // Logika untuk reject
+      console.log("Rejected:", rowData);
+    }
+  };
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
@@ -211,16 +222,7 @@ export function DetailApproval() {
                 >
                   MJ Mengatahui
                 </TableCell>
-                <TableCell
-                  sx={{
-                    ...layoutPrivateStyle.manageTableCell,
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  MJ Mengatahui
-                </TableCell>
+
                 <TableCell
                   sx={{
                     ...layoutPrivateStyle.manageTableCell,
@@ -297,16 +299,9 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.AnggotaKomisi}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        ...layoutPrivateStyle.manageTableCell,
-                        textAlign: "center",
-                      }}
-                    >
                       {ex.mjMengetahui}
                     </TableCell>
+                   
                     <TableCell
                       sx={{
                         ...layoutPrivateStyle.manageTableCell,
@@ -325,16 +320,23 @@ export function DetailApproval() {
                         display="flex"
                         flexDirection="row"
                         justifyContent="center"
-                        gap={1}
+                        alignItems="center"
+                        gap={2}
                       >
                         <InputLabel
-                          sx={{
-                            cursor: "pointer",
-                          }}
+                          sx={{ cursor: "pointer" }}
+                          onClick={() => handleApprovalClick("approve", ex.transactionID)} // ganti `row` sesuai konteks
                         >
                           <DoneIcon style={{ color: "green" }} />
                         </InputLabel>
+                        <InputLabel
+                          sx={{ cursor: "pointer" }}
+                          onClick={() => handleApprovalClick("reject", ex.transactionID)}
+                        >
+                          <CancelIcon style={{ color: "red" }} />
+                        </InputLabel>
                       </Box>
+
                     </TableCell>
                   </TableRow>
                 ))
@@ -378,7 +380,7 @@ export function DetailApproval() {
                     textAlign: "center",
                   }}
                 >
-                  Tanggal
+                  Tanggal Pengajuan
                 </TableCell>
                 {headersScore.map((header, headerIndex) => {
                   if (!excludedHeaders.includes(header)) {
@@ -504,7 +506,7 @@ export function DetailApproval() {
                             </InputLabel>
                           </Button>
                         ) : (
-                           "N/A"
+                          "N/A"
                         )}
                       </Box>
                     </TableCell>
