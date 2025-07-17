@@ -34,6 +34,8 @@ export function DefaultPeminjamanRuangan() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
+  const [totalData, setTotalData] = useState(0);
+
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -70,10 +72,11 @@ export function DefaultPeminjamanRuangan() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchRequestData();
+        const response = await fetchRequestData(page, rowsPerPage);
         if (response.statusCode === 200) {
           setDataBind(response.data);
           setFilteredData(response.data);
+          setTotalData(response.totalData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -211,95 +214,94 @@ export function DefaultPeminjamanRuangan() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {filteredData.length > 0 ? (
-                filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex: Data, index) => (
-                    <TableRow
-                      key={ex.transactionID}
+              {dataBind.length > 0 ? (
+                dataBind.map((ex: Data, index) => (
+                  <TableRow
+                    key={ex.transactionID}
+                    sx={{
+                      "&:last-child td, &:last-child th": {
+                        border: 0,
+                      },
+                    }}
+                  >
+                    <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                      {ex.reservationDateString}
+                    </TableCell>
+                    <TableCell
                       sx={{
-                        "&:last-child td, &:last-child th": {
-                          border: 0,
-                        },
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
                       }}
                     >
-                      <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.reservationDateString}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.startTime}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.roomName}
-                      </TableCell>
+                      {ex.startTime}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.roomName}
+                    </TableCell>
 
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.createdBy}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.createdDate}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.status === "Approve" ? (
+                        <DoneIcon style={{ color: "green" }} />
+                      ) : ex.status === "reject" ? (
+                        <CloseIcon style={{ color: "red" }} />
+                      ) : ex.status === "Pending" ? (
+                        <PendingActionsIcon style={{ color: "red" }} />
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="center"
+                        gap={1}
                       >
-                        {ex.createdBy}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.createdDate}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.status === "Approve" ? (
-                          <DoneIcon style={{ color: "green" }} />
-                        ) : ex.status === "reject" ? (
-                          <CloseIcon style={{ color: "red" }} />
-                        ) : ex.status === "Pending" ? (
-                          <PendingActionsIcon style={{ color: "red" }} />
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        <Box
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="center"
-                          gap={1}
+                        <InputLabel
+                          onClick={() => clickViewData(ex)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
+                            marginBottom: "5px",
+                          }}
                         >
-                          <InputLabel
-                            onClick={() => clickViewData(ex)}
-                            sx={{
-                              ...layoutPrivateStyle.manageTitleAction,
-                              cursor: "pointer",
-                              marginBottom: "5px",
-                            }}
-                          >
-                            <VisibilityIcon />
-                          </InputLabel>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                          <VisibilityIcon />
+                        </InputLabel>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
                   <TableCell colSpan={8} align="center">
@@ -314,7 +316,7 @@ export function DefaultPeminjamanRuangan() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={filteredData.length}
+            count={totalData}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}

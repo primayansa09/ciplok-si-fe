@@ -5,9 +5,9 @@ import { RequestFormAPI } from "../constants/apiRequestForm";
 import { Criteria, CriteriaData, Data, DataInsert, DataMJ } from "../store/formPeminjaman/type";
 import { ApiResponse } from "../types/response";
 
-export const fetchRequestData = async (): Promise<ApiResponse<Data[]>> => {
+export const fetchRequestData = async (page: number, pageSize: number): Promise<ApiResponse<Data[]>> => {
   try {
-    const response = await apiClient.get<ApiResponse<Data[]>>(RequestFormAPI.getData);
+    const response = await apiClient.get<ApiResponse<Data[]>>(`${RequestFormAPI.getData}?${page + 1}&pageSize=${pageSize}`);
     if (response.data.statusCode === 200) {
       return response.data; 
     } else {

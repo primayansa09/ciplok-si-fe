@@ -23,11 +23,11 @@ export const fetchNamaPenatua = async (query: string) => {
   }
 };
 
-export const fetchDataJemaat = async (): Promise<ApiResponse<Data[]>> => {
+export const fetchDataJemaat = async (page: number, pageSize: number): Promise<ApiResponse<Data[]>> => {
   try {
-    const response = await apiClient.post<ApiResponse<Data[]>>(ApiJemaat.getData);
+    const response = await apiClient.post<ApiResponse<Data[]>>(`${ApiJemaat.getData}?pageNumber=${page + 1}&pageSize=${pageSize}`);
     if (response.data.statusCode === 200) {
-      return response.data; 
+      return response.data;
     } else {
       console.error(`Error: ${response.data.message}`);
       return {

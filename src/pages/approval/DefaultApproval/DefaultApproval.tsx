@@ -37,7 +37,7 @@ export function DefaultApproval() {
   );
   const [filteredData, setFilteredData] = useState<DataApproval[]>([]);
 
-  const [page, setPage] = useState(pageNumber - 1);
+  const [page, setPage] = useState(pageNumber > 0 ? pageNumber - 1 : 0);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const [searchData, setSearchData] = useState("");
 
@@ -60,6 +60,9 @@ export function DefaultApproval() {
     }
   }, [data, searchData]);
 
+  useEffect(() => {
+    setPage(pageNumber - 1); // karena redux pakai 1-based, MUI pakai 0-based
+  }, [pageNumber]);
 
 
 
@@ -192,8 +195,8 @@ export function DefaultApproval() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {filteredData.length > 0 ? (
-                filteredData
+              {data.length > 0 ? (
+                data
                   .map((ex: any, index) => (
                     <TableRow
 
@@ -279,14 +282,13 @@ export function DefaultApproval() {
         </TableContainer>
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
-            component="div"
             count={totalData}
-            page={totalPages}
+            page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[10, 25, 50]}
-            labelRowsPerPage="Showing"
+            labelRowsPerPage="Menampilkan"
           />
         </Box>
       </Paper>

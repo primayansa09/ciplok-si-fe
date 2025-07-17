@@ -37,8 +37,8 @@ export function DefaultDataMajelis() {
   const [open, setOpen] = useState(false);
   const [searchData, setSearchData] = useState("");
   const [filteredData, setFilteredData] = useState<DataMajelis[]>([]);
-  const [page, setPage] = useState(pageNumber - 1);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
+  const [page, setPage] = useState(pageNumber > 0 ? pageNumber - 1 : 0);
 
   useEffect(() => {
     dispatch(
@@ -59,6 +59,9 @@ export function DefaultDataMajelis() {
     }
   }, [data, searchData]);
 
+  useEffect(() => {
+    setPage(pageNumber - 1); // karena redux pakai 1-based, MUI pakai 0-based
+  }, [pageNumber]);
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -169,105 +172,103 @@ export function DefaultDataMajelis() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {filteredData.length > 0 ? (
-                filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((ex) => (
-                    <TableRow
-                      key={ex.codePnt}
+              {data.length > 0 ? (
+                data.map((ex) => (
+                  <TableRow
+                    key={ex.codePnt}
+                    sx={{
+                      "&:last-child td, &:last-child th": {
+                        border: 0,
+                      },
+                    }}
+                  >
+                    <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                      {ex.codePnt}
+                    </TableCell>
+                    <TableCell
                       sx={{
-                        "&:last-child td, &:last-child th": {
-                          border: 0,
-                        },
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
                       }}
                     >
-                      <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.codePnt}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
+                      {ex.fullName}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.jabatanPenatua}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.phoneNo}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.startDate
+                        ? format(new Date(ex.startDate), "dd-MMMM-yyyy")
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      {ex.endDate
+                        ? format(new Date(ex.endDate), "dd-MMMM-yyyy")
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="center"
+                        gap={1}
                       >
-                        {ex.fullName}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.jabatanPenatua}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.phoneNo}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.startDate
-                          ? format(new Date(ex.startDate), "dd-MMMM-yyyy")
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.endDate
-                          ? format(new Date(ex.endDate), "dd-MMMM-yyyy")
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        <Box
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="center"
-                          gap={1}
+                        <InputLabel
+                          onClick={() => clickEditData(ex)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
+                            marginBottom: "5px",
+                          }}
                         >
-                          <InputLabel
-                            onClick={() => clickEditData(ex)}
-                            sx={{
-                              ...layoutPrivateStyle.manageTitleAction,
-                              cursor: "pointer",
-                              marginBottom: "5px",
-                            }}
-                          >
-                            <EditIcon />
-                          </InputLabel>
-                          <InputLabel
-                            onClick={() => setOpen(true)}
-                            sx={{
-                              ...layoutPrivateStyle.manageTitleAction,
-                              cursor: "pointer",
-                            }}
-                          >
-                            <DeleteIcon />
-                          </InputLabel>
-                          <ConfirmDeleteModal
-                            open={open}
-                            onClose={() => setOpen(false)}
-                            onConfirm={handleDelete}
-                          />
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                          <EditIcon />
+                        </InputLabel>
+                        <InputLabel
+                          onClick={() => setOpen(true)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
+                          }}
+                        >
+                          <DeleteIcon />
+                        </InputLabel>
+                        <ConfirmDeleteModal
+                          open={open}
+                          onClose={() => setOpen(false)}
+                          onConfirm={handleDelete}
+                        />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
                   <TableCell colSpan={8} align="center">
@@ -280,14 +281,13 @@ export function DefaultDataMajelis() {
         </TableContainer>
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
-            component="div"
             count={totalData}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[10, 25, 50]}
-            labelRowsPerPage="Showing"
+            labelRowsPerPage="Menampilkan"
           />
         </Box>
       </Paper>
