@@ -31,7 +31,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
   redirectTo,
 }) => {
   const navigate = useNavigate();
-
+  console.log(message)
   const handleConfirm = () => {
     onConfirm();
     navigate(redirectTo, { replace: true });

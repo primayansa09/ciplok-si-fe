@@ -51,6 +51,20 @@ export const createFormRequest = (formData: DataInsert): Promise<ApiResponse<Boo
     });
 };
 
+export const updateFromRequest = (transactionID: number, formData: DataInsert): Promise<any> => {
+  console.log("Edit Majelis form data:", formData);
+  return apiClient
+    .post(`${RequestFormAPI.updateData}/${transactionID}`, formData)
+    .then((response) => {
+      const responseData = response.data;
+      return responseData;
+    })
+    .catch((error) => {
+      console.error("Error updating data:", error);
+      throw error;
+    });
+};
+
 
 export const fetchDataMajelis = async (): Promise<ApiResponse<DataMJ[]>> => {
   try {

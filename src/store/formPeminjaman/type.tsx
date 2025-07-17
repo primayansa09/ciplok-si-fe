@@ -48,6 +48,7 @@ export type DataInsert = {
 };
 
 export type DetailData = {
+    idTrDetail:number;
     criteriaID: number;
     subCriteriaID: string;
     subCriteriaName: string;
@@ -103,6 +104,7 @@ export type ScoreData = {
 
 
 export type SubCriteria = {
+    idTrDetail:number;
     idSubCriteria: number;
     idCriteria: number;
     subCriteriaName: string;

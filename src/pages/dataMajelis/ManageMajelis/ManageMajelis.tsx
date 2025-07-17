@@ -92,8 +92,9 @@ export function ManageMajelis() {
           setOpenModal(true);
         }
       } else {
+        console.log('dasdasdas')
         response = await updateDataMajelis(itemData.majelisID, formDataMajelis);
-        if (response.status === 200) {
+        if (response.statusCode === 200) {
           setFormDataMajelis({
             majelisID: "",
             userID: "",
@@ -364,6 +365,7 @@ export function ManageMajelis() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 value={awalPeriode}
+                format="DD-MMMM-YYYY"
                 onChange={handleAwalPeriodeChange}
                 slotProps={{
                   textField: {
@@ -384,6 +386,7 @@ export function ManageMajelis() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 value={akhirPeriode}
+                format="DD-MMMM-YYYY"
                 onChange={handleAkhirPeriodeChange}
                 minDate={awalPeriode ?? undefined}
                 slotProps={{

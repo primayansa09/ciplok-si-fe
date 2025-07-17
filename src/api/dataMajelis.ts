@@ -30,7 +30,7 @@ export const createDataMajelis = (formData: DataInsert): Promise<ApiResponse<Boo
     });
 };
 
-export const updateDataMajelis = (majelisID: number, formData: DataInsert): Promise<any> => {
+export const updateDataMajelis = (majelisID: number, formData: DataInsert): Promise<ApiResponse<Boolean>> => {
   console.log("Edit Majelis form data:", formData);
   return apiClient
     .post(`${DataMajelisAPI.updateData}/${majelisID}`, formData)

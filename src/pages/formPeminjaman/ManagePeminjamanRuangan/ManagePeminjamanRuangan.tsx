@@ -32,11 +32,9 @@ import VerticalAlignBottomIcon from "@mui/icons-material/VerticalAlignBottom";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchAnggotaKomisi } from "../../../api/getDataSettings";
 import { DataSettings } from "../../../store/dataSettings/type";
-import { Criteria, CriteriaData, DataInsert, DataMJ, DetailData, initialCriteriaDetails } from "../../../store/formPeminjaman/type";
-import { createFormRequest, fetchDataCriteriaRequest, fetchDataMajelis } from "../../../api/dataRequestForm";
-import { fetchDataCriteria } from "../../../api/dataCriteria";
+import { Criteria, DataInsert, DataMJ, DetailData } from "../../../store/formPeminjaman/type";
+import { createFormRequest, fetchDataCriteriaRequest, fetchDataMajelis, updateFromRequest } from "../../../api/dataRequestForm";
 import MessageModal from "../../../components/Modal/MessageModal";
-import { debug } from "console";
 
 export function ManagePeminjamanRuangan() {
   const navigate = useNavigate();
@@ -121,13 +119,12 @@ export function ManagePeminjamanRuangan() {
 
   useEffect(() => {
     if (IsEdit && itemData && criteriaData!.length > 0) {
-      console.log(itemData)
+      console.log(itemData.subCriteriaList)
       console.log(criteriaData)
       const mappedSubCriteriaList: DetailData[] = itemData.subCriteriaList.map((existingSub: DetailData) => {
         const matchingCriteria = criteriaData.find(
           (criteria) => criteria.idHeaderCriteria === existingSub.criteriaID
         );
-
         if (!matchingCriteria) {
           return existingSub;
 
@@ -140,8 +137,9 @@ export function ManagePeminjamanRuangan() {
         if (!selectedSub) {
           return existingSub;
         }
-
         return {
+          bobot:matchingCriteria.bobot,
+          parameter:matchingCriteria.parameter === "Maksimal" ? true : false,
           criteriaID: matchingCriteria.idHeaderCriteria,
           subCriteriaID: selectedSub.idSubCriteria.toString(),
           subCriteriaName: selectedSub.subCriteriaName,
@@ -178,6 +176,10 @@ export function ManagePeminjamanRuangan() {
 
   const handleTanggalPemakaian = (newValue: Dayjs | null) => {
     setTanggalPemakaian(newValue);
+     setFormPeminjaman({
+        ...formPeminjaman,
+        reservationDate: newValue!.toDate(),
+      });
   };
 
 
@@ -192,6 +194,7 @@ export function ManagePeminjamanRuangan() {
     if (!selectedSubData) return;
 
     const newDetail = {
+      idTrDetail:selectedSubData.idTrDetail,
       criteriaName: criteria.criteriaName,
       criteriaCode: criteria.criteriaCode,
       bobot: criteria.bobot,
@@ -241,29 +244,29 @@ export function ManagePeminjamanRuangan() {
             subCriteriaList: []
           });
           setModalMessage(response.message || "Data created successfully!");
-          setRedirectTo("/kriteria-sub-kriteria");
+          setRedirectTo("/pinjam-ruangan/form-peminjaman");
           setOpenModal(true);
         }
       } else {
-        // response = await editDataCriteria(formKriteria.idHeaderCriteria, formKriteria);
-        // if (response.statusCode === 200) {
-        //  setFormPeminjaman({
-        //   transactionID: "",
-        //   status: "",
-        //   startTime: "",
-        //   roomName: "",
-        //   reservationDate: new Date(),
-        //   createdDate: new Date(),
-        //   createdBy: "",
-        //   description: "",
-        //   mjRequest: "",
-        //   mjMengetahui: "",
-        //   subCriteriaList: []
-        // });
-        // setModalMessage(response.message || "Data updated successfully!");
-        setRedirectTo("/kriteria-sub-kriteria");
-        setOpenModal(true);
-        // }
+        response = await updateFromRequest(formPeminjaman.transactionID, formPeminjaman);
+        if (response.statusCode === 200) {
+          setFormPeminjaman({
+            transactionID: 0,
+            status: "",
+            startTime: "",
+            roomName: "",
+            reservationDate: new Date(),
+            createdDate: new Date(),
+            createdBy: "",
+            description: "",
+            mjRequest: "",
+            mjMengetahui: "",
+            subCriteriaList: []
+          });
+          setModalMessage(response.message || "Data updated successfully!");
+          setRedirectTo("/pinjam-ruangan/form-peminjaman");
+          setOpenModal(true);
+        }
       }
     } catch (ex) {
       setModalMessage("An error occurred while submitting the form.");
@@ -469,7 +472,7 @@ export function ManagePeminjamanRuangan() {
                 <DemoContainer components={["DatePicker"]}>
                   <DatePicker
                     value={tanggalPengajuan}
-                    onChange={handleTanggalPemakaian}
+                    // onChange={handleTanggalPemakaian}
                     format="DD-MMMM-YYYY"
                     slotProps={{
                       textField: {
