@@ -18,64 +18,32 @@ import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import DoneIcon from "@mui/icons-material/Done";
 import CancelIcon from '@mui/icons-material/Cancel';
 import HeaderSection from "../../../components/commponentHeader/Header";
-import { fetchApprovalByDate } from "../../../api/dataApproval";
-import { ReservationData, ScoreData, } from "../../../store/formPeminjaman/type";
+import { fetchApprovalByDate, finalizeApprovalData } from "../../../api/dataApproval";
+import { FinalizeApproval, ReservationData, ScoreData, } from "../../../store/formPeminjaman/type";
+import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
+import MessageModal from "../../../components/Modal/MessageModal";  // Ensure you are importing the MessageModal
+
 
 export function DetailApproval() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dataDummyApprovalDetail = [
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "approve",
-      durasi: "4 Jam",
-      jumlahOrang: "7",
-      peminjaman: "Komisi Pemuda",
-      mjMengetahui: "Erin Mutiara",
-      jemaatPeminjaman: "Zaki",
-    },
-  ];
-
-  const dataDummyPenunjang = [
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "1",
-      peminjam: "4 Jam",
-      durasi: "7",
-      statusRutin: "1",
-      tanggalPengajuan: "12 April 2025",
-      score: "5",
-      status: "Cancel",
-    },
-    {
-      tanggalPemakaian: "12 April 2025",
-      jamPemakaian: "09.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "1",
-      peminjam: "4 Jam",
-      durasi: "7",
-      statusRutin: "1",
-      tanggalPengajuan: "12 April 2025",
-      score: "5",
-      status: "Approve",
-    },
-  ];
-
   const [dataBind, setDataBind] = useState<ReservationData[]>([]);
   const [dataBindPenunjang, setDataBindPenunjang] = useState<ScoreData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { reservationDate, startTime, roomName } = location.state || {};
-  const [headers, setHeaders] = useState<string[]>([]); // State for dynamic headers
-  const [headersScore, setHeadersScore] = useState<string[]>([]); // State for dynamic headers
-
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [headersScore, setHeadersScore] = useState<string[]>([]);
   const clickCancel = () => {
     navigate("/pinjam-ruangan/approval", { replace: true });
   };
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [redirectTo, setRedirectTo] = useState("");
+  const [currentAction, setCurrentAction] = useState<"approve" | "reject" | null>(null);
+
+  const [selectedData, setSelectedData] = useState<ReservationData | null>(null);
+  const [buttonText, setButtonText] = useState("Ok");  // State to control button text in the modal
 
   const excludedHeaders = [
     "transactionID",
@@ -94,23 +62,19 @@ export function DetailApproval() {
   ];
   useEffect(() => {
     const fetchData = async () => {
-      // setLoading(true);
       try {
         const formattedString = `${reservationDate};${startTime};${roomName}`;
         const response = await fetchApprovalByDate(formattedString);
         if (response.statusCode === 200) {
           console.log(response.data[0])
-          const reservationData = response.data.reservationData;  // Array 1
-          const scoreData = response.data.scoreData;  // Array 2
-
-          console.log(reservationData);  // Log the first array
-          console.log(scoreData);  // Log the second array
-
+          const reservationData = response.data.reservationData;
+          const scoreData = response.data.scoreData;
+          console.log(reservationData);
+          console.log(scoreData);
           setDataBind(response.data.reservationData);
           setDataBindPenunjang(scoreData);
           if (reservationData.length > 0) {
-            const dynamicHeaders = Object.keys(reservationData[0]); // Extract keys dynamically from the first item
-            // Filter out the excluded headers
+            const dynamicHeaders = Object.keys(reservationData[0]);
             const filteredHeaders = dynamicHeaders.filter(header => !excludedHeaders.includes(header));
             setHeaders(filteredHeaders);
           }
@@ -137,16 +101,52 @@ export function DetailApproval() {
     console.log(headers)
     console.log(headersScore)
   }, [dataBind])
-
-
-  const handleApprovalClick = (action: "approve" | "reject", rowData: number) => {
-    if (action === "approve") {
-      console.log("Approved:", rowData);
-    } else if (action === "reject") {
-      // Logika untuk reject
-      console.log("Rejected:", rowData);
-    }
+  const closeModal = () => {
+    setOpenModal(false);
   };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);
+    navigate(redirectTo, { replace: true });
+  };
+
+  const handleApprovalClick = (action: "approve" | "reject", ex: ReservationData) => {
+    setCurrentAction(action);
+    setSelectedData(ex); // Set the selected data for modal
+    const message = action === "approve" ?`Are you sure you want to Approve  ${ex.createdBy} this request?` : "Are you sure you want to reject this request?";
+    setModalMessage(message);
+    setOpenModal(true); // Open modal when action is clicked
+  };
+
+   const handleConfirm = async () => {
+    if (!currentAction || !selectedData) return;
+
+    const ex = selectedData;
+    const formData = {
+      transactionID: ex.transactionID,
+      reservationDate: ex.reservationDate,
+      startTime: ex.startTime,
+      roomName: ex.roomName,
+      status: currentAction === "approve" ? "Approved" : "Rejected"
+    };
+
+    try {
+      // Call API to finalize approval
+      const response = await finalizeApprovalData(ex.transactionID, formData);
+
+      // Set the modal message based on the response
+      if (response.statusCode === 200) {
+        setModalMessage("Request has been successfully processed.");
+      } else {
+        setModalMessage(response.message || "Something went wrong.");
+      }
+    } catch (error) {
+      setModalMessage("Something went wrong.");
+    }
+
+    setOpenModal(false); // Keep the modal open
+  };
+
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
@@ -285,8 +285,7 @@ export function DetailApproval() {
                               textAlign: "center",
                             }}
                           >
-                            {/* Render the value dynamically using the header as the key */}
-                            {ex[header] ?? "N/A"} {/* If the value is undefined, show 'N/A' */}
+                            {ex[header] ?? "N/A"}
                           </TableCell>
                         );
                       }
@@ -301,7 +300,7 @@ export function DetailApproval() {
                     >
                       {ex.mjMengetahui}
                     </TableCell>
-                   
+
                     <TableCell
                       sx={{
                         ...layoutPrivateStyle.manageTableCell,
@@ -325,18 +324,17 @@ export function DetailApproval() {
                       >
                         <InputLabel
                           sx={{ cursor: "pointer" }}
-                          onClick={() => handleApprovalClick("approve", ex.transactionID)} // ganti `row` sesuai konteks
+                          onClick={() => handleApprovalClick("approve", ex)} // Passing the entire ex object
                         >
                           <DoneIcon style={{ color: "green" }} />
                         </InputLabel>
                         <InputLabel
                           sx={{ cursor: "pointer" }}
-                          onClick={() => handleApprovalClick("reject", ex.transactionID)}
+                          onClick={() => handleApprovalClick("reject", ex)} // Passing the entire ex object
                         >
                           <CancelIcon style={{ color: "red" }} />
                         </InputLabel>
                       </Box>
-
                     </TableCell>
                   </TableRow>
                 ))
@@ -351,6 +349,13 @@ export function DetailApproval() {
             </TableBody>
           </Table>
         </TableContainer>
+       <ConfirmationModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}  // Close modal when user clicks "No"
+          onConfirm={handleConfirm}  // Handle confirmation when user clicks "Yes"
+          message={modalMessage}  // Pass the success/error message to the modal
+        />
+
         {/* Table Penunjang Keputusan */}
         <InputLabel
           sx={{

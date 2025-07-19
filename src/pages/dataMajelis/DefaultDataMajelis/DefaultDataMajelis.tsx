@@ -26,6 +26,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
 import { format } from "date-fns";
 import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
+import ConfirmDownloadModal from "../../../components/ConfirmModalDownload";
+import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
@@ -260,10 +262,12 @@ export function DefaultDataMajelis() {
                         >
                           <DeleteIcon />
                         </InputLabel>
-                        <ConfirmDeleteModal
+                        <ConfirmationModal
                           open={open}
                           onClose={() => setOpen(false)}
                           onConfirm={handleDelete}
+                          message=""
+                          // buttonText="ok"
                         />
                       </Box>
                     </TableCell>

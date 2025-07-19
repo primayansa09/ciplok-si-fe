@@ -1,8 +1,9 @@
 import React from "react";
 import { Modal, Box, Typography, Button, Stack } from "@mui/material";
 
-interface ConfirmDeleteModalProps {
+interface ConfirmationModalProps {
   open: boolean;
+  message: string;
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -20,10 +21,11 @@ const modalStyle = {
   textAlign: "center",
 };
 
-const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   open,
   onClose,
   onConfirm,
+  message,
 }) => {
   return (
     <Modal
@@ -37,7 +39,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     >
       <Box sx={modalStyle}>
         <Typography variant="h6" mb={3}>
-          Apakah anda yakin ingin <br /> menghapus data ini?
+        {message}
         </Typography>
         <Stack direction="row" spacing={2} justifyContent="center">
           <Button
@@ -48,7 +50,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               "&:hover": { backgroundColor: "#003B8A" },
             }}
           >
-            OK
+            Yes
           </Button>
           <Button
             variant="contained"
@@ -58,7 +60,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               "&:hover": { backgroundColor: "#B71C1C" },
             }}
           >
-            Batal
+            No
           </Button>
         </Stack>
       </Box>
@@ -66,4 +68,4 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   );
 };
 
-export default ConfirmDeleteModal;
+export default ConfirmationModal;

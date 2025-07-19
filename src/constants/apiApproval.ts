@@ -4,4 +4,6 @@ export const ApprovalAPI = {
   getData: `${BASE_URL}/approval/getDataReservation`, // ✅ disesuaikan ke endpoint baru
   getDataApprovalByDate: `${BASE_URL}/approval/getDataApprovalByDate`,
   deleteData: `${BASE_URL}/Majelis/delete`,
+  finalizeApproval: `${BASE_URL}/approval/finalizeApproval`,
+  getListApproval: `${BASE_URL}/approval/getListApproval`
 };

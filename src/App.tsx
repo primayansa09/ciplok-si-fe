@@ -16,8 +16,7 @@ import { setTokenFromSession } from "./store/auth/authSlice";
 import { Login } from "./pages/login/login";
 import { DataMajelis } from "./pages/dataMajelis/DataMajelis";
 import { DataJemaat } from "./pages/dataJemaat/DataJemaat";
-import { DataKegiatan } from "./pages/dataKegiatan/DataKegiatan";
-import { DataRuangan } from "./pages/dataRuangan/DataRuangan";
+// import { DataRuangan } from "./pages/dataRuangan/DataRuangan";
 import { PeminjamanRuangan } from "./pages/formPeminjaman/PeminjamanRuangan";
 import { Approval } from "./pages/approval/Approval";
 import { ManageMajelis } from "./pages/dataMajelis/ManageMajelis";
@@ -51,8 +50,6 @@ function App() {
               <Route path="/master-data/data-majelis" element={<DataMajelis />} />
               <Route path="/dashboard" element={<Dashboard/>} />
               <Route path="/master-data/data-jemaat" element={<DataJemaat />} />
-              <Route path="/master-data/data-kegiatan" element={<DataKegiatan />} />
-              <Route path="/master-data/data-ruangan" element={<DataRuangan />} />
               <Route path="/pinjam-ruangan/approval" element={<Approval />} />
               <Route path="/manage-majelis" element={<ManageMajelis />} />
               <Route path="/manage-jemaat" element={<ManageJemaat />} />

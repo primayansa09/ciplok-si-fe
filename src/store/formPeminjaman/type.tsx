@@ -18,8 +18,8 @@ export type Data = {
     description: string;
     mjRequest: string;
     createdBy: string;
-    createdDate:string;
-    startTime:string;
+    createdDate: string;
+    startTime: string;
 };
 
 export type DataMJ = {
@@ -48,7 +48,7 @@ export type DataInsert = {
 };
 
 export type DetailData = {
-    idTrDetail:number;
+    idTrDetail: number;
     criteriaID: number;
     subCriteriaID: string;
     subCriteriaName: string;
@@ -82,15 +82,16 @@ export type CriteriaData = {
 }
 
 export type ReservationData = {
+    [key: string]: string | number | null;
     transactionID: number;
-    reservationDate: Date;
+    reservationDate: string;
     startTime: string;
     description: string;
     mjMengetahui: string;
     peminjaman: string | null;
     roomName: string | null;
     createdBy: string | null;
-    deskripsi: string | null;
+    status: string;
 
 };
 
@@ -104,7 +105,7 @@ export type ScoreData = {
 
 
 export type SubCriteria = {
-    idTrDetail:number;
+    idTrDetail: number;
     idSubCriteria: number;
     idCriteria: number;
     subCriteriaName: string;
@@ -126,6 +127,13 @@ export interface DataApproval {
     roomName: string;
 }
 
+export interface FinalizeApproval {
+    transactionID: number;
+    reservationDate: Date;
+    startTime: string;
+    roomName: string;
+    status: string;
+}
 
 
 export interface LocationState {

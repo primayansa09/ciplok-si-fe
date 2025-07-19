@@ -224,7 +224,10 @@ export function DefaultPeminjamanRuangan() {
                       },
                     }}
                   >
-                    <TableCell sx={layoutPrivateStyle.manageTableCell}>
+                    <TableCell sx={{
+                      ...layoutPrivateStyle.manageTableCell,
+                      textAlign: "center",
+                    }}>
                       {ex.reservationDateString}
                     </TableCell>
                     <TableCell
@@ -266,9 +269,9 @@ export function DefaultPeminjamanRuangan() {
                         textAlign: "center",
                       }}
                     >
-                      {ex.status === "Approve" ? (
+                      {ex.status === "Approved" ? (
                         <DoneIcon style={{ color: "green" }} />
-                      ) : ex.status === "reject" ? (
+                      ) : ex.status === "Rejected" ? (
                         <CloseIcon style={{ color: "red" }} />
                       ) : ex.status === "Pending" ? (
                         <PendingActionsIcon style={{ color: "red" }} />

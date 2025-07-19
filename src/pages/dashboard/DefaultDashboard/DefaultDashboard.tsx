@@ -16,11 +16,7 @@ import {
   Paper,
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
-import { Data } from "../../../store/dashboard/type";
 import HeaderSection from "../../../components/commponentHeader/Header";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../store";
-import { format } from "date-fns";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -29,149 +25,26 @@ import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import dayjs, { Dayjs } from "dayjs";
 import * as XLSX from "xlsx";
 import ConfirmDownloadModal from "../../../components/ConfirmModalDownload";
+import { fetchDataApproval } from "../../../api/dataApproval";
+import { ReservationData } from "../../../store/formPeminjaman/type";
 
 export function DefaultDashboard() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  //   const {data, loading, error, pageNumber, pageSize, totalPages, totalData } = useSelector(
-  //     (state: RootState) => state.
-  // );
-
-  const dataDummyDashboard = [
-    {
-      id: "1",
-      tanggal: "12 Jul 2025",
-      jam: "10.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "Latihan ibadah KU",
-      durasi: "2 jam",
-      jumlahOrang: 5,
-      peminjam: "MJ",
-      mjMengetahui: "Pdt Diana Bachri",
-      jemaatPeminjam: "Hein",
-    },
-    {
-      id: "2",
-      tanggal: "16 Jul 2025",
-      jam: "10.00",
-      ruangan: "Ruang Musik F11",
-      jenisKegiatan: "Latihan ibadah KP",
-      durasi: "3 jam",
-      jumlahOrang: 7,
-      peminjam: "Komisi Pemuda",
-      mjMengetahui: "Erin Mutiara N",
-      jemaatPeminjam: "Wening",
-    },
-    {
-      id: "3",
-      tanggal: "7/16/2025",
-      jam: "10.00",
-      ruangan: "F9",
-      jenisKegiatan: "Latihan ibadah KR",
-      durasi: "3 jam",
-      jumlahOrang: 9,
-      peminjam: "Komisi Remaja",
-      mjMengetahui: "Jusak Fajar H",
-      jemaatPeminjam: "Zaki",
-    },
-    {
-      id: "4",
-      tanggal: "7/17/2025",
-      jam: "16.00",
-      ruangan: "Konsis F9",
-      jenisKegiatan: "Latihan regen gitar",
-      durasi: "1 jam",
-      jumlahOrang: 4,
-      peminjam: "Komisi Remaja",
-      mjMengetahui: "Jusak Fajar H",
-      jemaatPeminjam: "Jemima",
-    },
-    {
-      id: "5",
-      tanggal: "7/17/2025",
-      jam: "16.00",
-      ruangan: "F11",
-      jenisKegiatan: "Latihan regen band",
-      durasi: "1 jam",
-      jumlahOrang: 5,
-      peminjam: "Komisi Remaja",
-      mjMengetahui: "Jusak Fajar H",
-      jemaatPeminjam: "Jeska",
-    },
-    {
-      id: "6",
-      tanggal: "7/15/2025",
-      jam: "16.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "Latihan regen vokal",
-      durasi: "1 jam",
-      jumlahOrang: 3,
-      peminjam: "Komisi Remaja",
-      mjMengetahui: "Jusak Fajar H",
-      jemaatPeminjam: "Anya",
-    },
-    {
-      id: "7",
-      tanggal: "7/17/2025",
-      jam: "17.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "Latihan angeloudi",
-      durasi: "1 jam",
-      jumlahOrang: 20,
-      peminjam: "Komisi Anak",
-      mjMengetahui: "Ruth Pakan",
-      jemaatPeminjam: "Julia",
-    },
-    {
-      id: "8",
-      tanggal: "7/14/2025",
-      jam: "18.00",
-      ruangan: "Konsis Gereja",
-      jenisKegiatan: "Rapat",
-      durasi: "2 jam",
-      jumlahOrang: 15,
-      peminjam: "Panitia",
-      mjMengetahui: "Richard Sutupo",
-      jemaatPeminjam: "Maria",
-    },
-    {
-      id: "9",
-      tanggal: "7/12/2025",
-      jam: "18.00",
-      ruangan: "Gedung Gereja",
-      jenisKegiatan: "GR jumat agung",
-      durasi: "3 jam",
-      jumlahOrang: 35,
-      peminjam: "Panitia",
-      mjMengetahui: "Riza Barus",
-      jemaatPeminjam: "TU",
-    },
-  ];
-
   const [open, setOpen] = useState(false);
-  const [dataBind, setDataBind] = useState({ data: dataDummyDashboard });
+  const [dataBind, setDataBind] = useState<ReservationData[]>([]);
   const [searchData, setSearchData] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>(dataBind.data);
   const [page, setPage] = useState(0);
+  const [headers, setHeaders] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [tanggal, setTanggal] = React.useState<Dayjs | null>(null);
+  const [totalData, setTotalData] = useState(0);
 
   const handleTanggal = (newValue: Dayjs | null) => {
     setTanggal(newValue);
 
+
     const formattedDate = newValue ? newValue.format("DD MMM YYYY") : "";
     setSearchData(formattedDate);
   };
-
-  useEffect(() => {
-    // if (data) {
-    const filtered = dataBind.data.filter((item) =>
-      item.tanggal?.toLowerCase().includes(searchData)
-    );
-    setFilteredData(filtered);
-    // }
-  }, [searchData, dataBind.data]);
-
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -190,38 +63,80 @@ export function DefaultDashboard() {
     setOpen(false);
   };
 
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetchDataApproval(page, rowsPerPage, searchData);
+        console.log("API Response:", response); // Log response to verify data
+
+        // If the response is successful and contains data
+        if (response.statusCode === 200 && response.data.length > 0) {
+          setDataBind(response.data);
+          setTotalData(response.totalData);
+
+          const dynamicHeaders = Object.keys(response.data[0]);
+          const filteredHeaders = dynamicHeaders.filter(header => !excludedHeaders.includes(header));
+          setHeaders(filteredHeaders);
+        }
+
+        // If no data is found or a 400 error is returned
+        if (response.statusCode === 400 || response.data.length === 0) {
+          setDataBind([]); // Clear data when there is no data
+          setTotalData(0); // Reset totalData to 0 when there's no data
+          setHeaders([]); // Optionally reset headers too, if needed
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        setDataBind([]); // Set empty data on error
+        setTotalData(0); // Reset totalData
+        setHeaders([]); // Optionally reset headers too, if needed
+      }
+    };
+
+    loadData();
+  }, [page, rowsPerPage, searchData]);
+
+  useEffect(() => { }, [headers])
+
+  const excludedHeaders = [
+    "transactionID",
+    "reservationDate",
+    "startTime",
+    "roomName",
+    "mjMengetahui",
+    "createdBy",
+    "status"
+  ];
+
+
   const handleExportToExcel = () => {
-    const data = dataDummyDashboard.map((item) => ({
-      Tanggal: item.tanggal,
-      Jam: item.jam,
-      Ruangan: item.ruangan,
-      "Jenis Kegiatan": item.jenisKegiatan,
-      Durasi: item.durasi,
-      "Jumlah Orang": item.jumlahOrang,
-      Peminjam: item.peminjam,
-      "MJ Mengetahui": item.mjMengetahui,
-      "Jemaat Peminjam": item.jemaatPeminjam,
-    }));
+    // Prepare table headers and data
+    const tableHeaders = [
+      "Tanggal", "Jam", "Ruangan", ...headers.map((header) => header.charAt(0).toUpperCase() + header.slice(1)),
+      "MJ Mengatahui", "Jemaat Peminjaman", "Status"
+    ];
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DataPeminjaman");
+    const tableData = dataBind.map((row) => [
+      row.reservationDate,
+      row.startTime,
+      row.roomName,
+      ...headers.map((header) => row[header] ?? "N/A"),
+      row.mjMengetahui,
+      row.createdBy,
+      row.status
+    ]);
 
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    // Create a new workbook
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([tableHeaders, ...tableData]);
 
-    const fileData = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+    // Append the sheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
 
-    // saveAs(fileData, "DataPeminjaman.xlsx");
+    // Export the workbook to Excel
+    XLSX.writeFile(wb, "ExportedData.xlsx");
   };
-
-  //   if (loading) return <div>Loading...</div>;
-  //   if (error) return <div>Error: {error}</div>;
-
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
       <HeaderSection />
@@ -238,6 +153,7 @@ export function DefaultDashboard() {
                 <DatePicker
                   value={tanggal}
                   onChange={handleTanggal}
+                  format="DD-MMM-YYYY"
                   slotProps={{
                     textField: {
                       size: "small",
@@ -264,39 +180,101 @@ export function DefaultDashboard() {
           <Table sx={{ minWidth: 720 }} size="small" aria-label="a dense table">
             <TableHead sx={layoutPrivateStyle.moduleTableHead}>
               <TableRow sx={layoutPrivateStyle.manageTableRow}>
-                {[
-                  "Tanggal",
-                  "Jam",
-                  "Ruangan",
-                  "Jenis Kegiatan",
-                  "Durasi",
-                  "Jumlah Orang",
-                  "Peminjam",
-                  "MJ Mengetahui",
-                  "Jemaat Peminjam",
-                  "Surat",
-                ].map((label) => (
-                  <TableCell
-                    key={label}
-                    sx={{
-                      ...layoutPrivateStyle.manageTableCell,
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    {label}
-                  </TableCell>
-                ))}
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Tanggal
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Jam
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Ruangan
+                </TableCell>
+
+                {headers.map((header, index) => {
+                  return (
+                    <TableCell
+                      key={index}
+                      sx={{
+                        ...layoutPrivateStyle.manageTableCell,
+                        color: "white",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
+                    >
+                      {header.charAt(0).toUpperCase() + header.slice(1)} {/* Capitalize first letter */}
+                    </TableCell>
+                  );
+                })}
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  MJ Mengatahui
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Jemaat Peminjaman
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  sx={{
+                    ...layoutPrivateStyle.manageTableCell,
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Download
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {filteredData.length > 0 ? (
-                filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              {dataBind.length > 0 ? (
+                dataBind
                   .map((ex, index) => (
                     <TableRow
-                      key={ex.tanggal}
+                      key={ex.transactionID}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -304,7 +282,7 @@ export function DefaultDashboard() {
                       }}
                     >
                       <TableCell sx={layoutPrivateStyle.manageTableCell}>
-                        {ex.tanggal}
+                        {ex.reservationDate}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -312,7 +290,7 @@ export function DefaultDashboard() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.jam}
+                        {ex.startTime}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -320,40 +298,24 @@ export function DefaultDashboard() {
                           textAlign: "center",
                         }}
                       >
-                        {ex.ruangan}
+                        {ex.roomName}
                       </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.jenisKegiatan}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.durasi}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.jumlahOrang}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...layoutPrivateStyle.manageTableCell,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ex.peminjam}
-                      </TableCell>
+                      {headers.map((header, headerIndex) => {
+                        if (!excludedHeaders.includes(header)) {
+                          return (
+                            <TableCell
+                              key={headerIndex}
+                              sx={{
+                                ...layoutPrivateStyle.manageTableCell,
+                                textAlign: "center",
+                              }}
+                            >
+                              {ex[header] !== undefined && ex[header] !== null ? ex[header] : "N/A"}
+                            </TableCell>
+                          );
+                        }
+                        return null;
+                      })}
                       <TableCell
                         sx={{
                           ...layoutPrivateStyle.manageTableCell,
@@ -362,13 +324,22 @@ export function DefaultDashboard() {
                       >
                         {ex.mjMengetahui}
                       </TableCell>
+
                       <TableCell
                         sx={{
                           ...layoutPrivateStyle.manageTableCell,
                           textAlign: "center",
                         }}
                       >
-                        {ex.jemaatPeminjam}
+                        {ex.createdBy}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...layoutPrivateStyle.manageTableCell,
+                          textAlign: "center",
+                        }}
+                      >
+                        {ex.status}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -402,7 +373,7 @@ export function DefaultDashboard() {
                   ))
               ) : (
                 <TableRow sx={layoutPrivateStyle.manageTableRow}>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={headers.length + 5} align="center">
                     No Data Available.
                   </TableCell>
                 </TableRow>
@@ -413,7 +384,7 @@ export function DefaultDashboard() {
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             component="div"
-            count={dataBind.data.length}
+            count={totalData}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}

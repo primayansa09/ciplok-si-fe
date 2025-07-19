@@ -20,9 +20,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import { Data } from "../../../store/dataJemaat/type";
-import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchDataJemaat } from "../../../api/dataJemaat";
+import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
 
 export function DefaultDataJemaat() {
   const navigate = useNavigate();
@@ -178,10 +178,11 @@ export function DefaultDataJemaat() {
                         >
                           <DeleteIcon />
                         </InputLabel>
-                        <ConfirmDeleteModal
+                        <ConfirmationModal
                           open={open}
                           onClose={() => setOpen(false)}
                           onConfirm={handleDelete}
+                          message=""
                         />
                       </Box>
                     </TableCell>

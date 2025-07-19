@@ -1,1 +1,0 @@
-export {ManageRuangan} from "./ManageRuangan"

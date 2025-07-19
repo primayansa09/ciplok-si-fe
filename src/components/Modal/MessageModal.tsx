@@ -7,7 +7,7 @@ interface MessageModalProps {
   onClose: () => void;
   onConfirm: () => void;
   message: string;
-  redirectTo: string;
+  redirectTo?: string;
 }
 
 const modalStyle = {
@@ -34,7 +34,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
   console.log(message)
   const handleConfirm = () => {
     onConfirm();
-    navigate(redirectTo, { replace: true });
+    navigate(redirectTo!, { replace: true });
   };
 
   return (

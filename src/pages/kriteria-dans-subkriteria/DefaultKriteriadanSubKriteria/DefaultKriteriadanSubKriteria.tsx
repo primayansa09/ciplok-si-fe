@@ -25,6 +25,7 @@ import { Data, DataFilter } from "../../../store/kriteriaSubKriteria/type";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchDataCriteria } from "../../../api/dataCriteria";
+import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
 
 export function DefaultKriteriadanSubKriteria() {
   const navigate = useNavigate();
@@ -262,10 +263,12 @@ export function DefaultKriteriadanSubKriteria() {
                         >
                           <DeleteIcon />
                         </InputLabel>
-                        <ConfirmDeleteModal
+                        <ConfirmationModal
                           open={open}
                           onClose={() => setOpen(false)}
                           onConfirm={handleDelete}
+                          message=""
+                          // buttonText="ok"
                         />
                       </Box>
                     </TableCell>

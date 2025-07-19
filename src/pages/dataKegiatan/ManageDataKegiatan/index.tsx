@@ -1,1 +1,0 @@
-export {ManageKegiatan} from "./ManageKegiatan";
