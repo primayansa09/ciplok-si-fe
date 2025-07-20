@@ -22,7 +22,7 @@ import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import { Data } from "../../../store/dataJemaat/type";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchDataJemaat } from "../../../api/dataJemaat";
-import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 
 export function DefaultDataJemaat() {
   const navigate = useNavigate();

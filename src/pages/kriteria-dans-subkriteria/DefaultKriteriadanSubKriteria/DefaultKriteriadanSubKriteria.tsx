@@ -22,10 +22,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import logo from "../../../assets/logo.png";
 import { Data, DataFilter } from "../../../store/kriteriaSubKriteria/type";
-import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmationModal";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchDataCriteria } from "../../../api/dataCriteria";
-import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 
 export function DefaultKriteriadanSubKriteria() {
   const navigate = useNavigate();

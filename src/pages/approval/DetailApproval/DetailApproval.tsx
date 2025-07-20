@@ -20,7 +20,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchApprovalByDate, finalizeApprovalData } from "../../../api/dataApproval";
 import { FinalizeApproval, ReservationData, ScoreData, } from "../../../store/formPeminjaman/type";
-import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 import MessageModal from "../../../components/Modal/MessageModal";  // Ensure you are importing the MessageModal
 
 

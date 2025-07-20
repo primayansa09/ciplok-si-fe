@@ -20,14 +20,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import { DataMajelis } from "../../../store/dataMajelis/type";
-import ConfirmDeleteModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmationModal";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
 import { format } from "date-fns";
 import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
-import ConfirmDownloadModal from "../../../components/ConfirmModalDownload";
-import ConfirmationModal from "../../../components/Modal/ConfirmModalDelete";
+import ConfirmDownloadModal from "../../../components/Modal/ConfirmModalDownload";
+import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
