@@ -117,7 +117,7 @@ export function DefaultKriteriadanSubKriteria() {
               Tambah Data
             </Button>
           </Grid>
-          <Grid size={1}>
+          {/* <Grid size={1}>
             <InputLabel
               sx={{
                 ...layoutPrivateStyle.manageSubTitle,
@@ -138,7 +138,7 @@ export function DefaultKriteriadanSubKriteria() {
               fullWidth
               sx={{ marginBottom: "15px" }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
         <TableContainer
           sx={layoutPrivateStyle.manageTableContainer}

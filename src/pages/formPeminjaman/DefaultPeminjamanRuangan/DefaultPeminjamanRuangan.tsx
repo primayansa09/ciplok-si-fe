@@ -121,7 +121,7 @@ export function DefaultPeminjamanRuangan() {
               Tambah Data
             </Button>
           </Grid>
-          <Grid size={1}>
+          {/* <Grid size={1}>
             <InputLabel
               sx={{
                 ...layoutPrivateStyle.manageSubTitle,
@@ -142,7 +142,7 @@ export function DefaultPeminjamanRuangan() {
               fullWidth
               sx={{ marginBottom: "15px" }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
         <TableContainer
           sx={layoutPrivateStyle.manageTableContainer}

@@ -26,21 +26,23 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 
 
+
 export function DetailApproval() {
   const navigate = useNavigate();
   const location = useLocation();
   const [dataBind, setDataBind] = useState<ReservationData[]>([]);
   const [dataBindPenunjang, setDataBindPenunjang] = useState<ScoreData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [openMessageModal, setOpenMessageModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { reservationDate, startTime, roomName } = location.state || {};
   const [headers, setHeaders] = useState<string[]>([]);
   const [headersScore, setHeadersScore] = useState<string[]>([]);
   const clickCancel = () => {
     navigate("/pinjam-ruangan/approval", { replace: true });
-  };
-  const [openModal, setOpenModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  }
   const [redirectTo, setRedirectTo] = useState("");
   const [currentAction, setCurrentAction] = useState<"approve" | "reject" | null>(null);
 
@@ -108,21 +110,24 @@ export function DetailApproval() {
     console.log(headersScore)
   }, [dataBind])
   const closeModal = () => {
-    setOpenModal(false);
+    setOpenConfirmModal(false);
   };
 
   const handleModalConfirm = () => {
-    setOpenModal(false);
+    setOpenMessageModal(false);
     navigate(redirectTo, { replace: true });
   };
 
   const handleApprovalClick = (action: "approve" | "reject", ex: ReservationData) => {
     setCurrentAction(action);
-    setSelectedData(ex); // Set the selected data for modal
-    const message = action === "approve" ? `Are you sure you want to Approve  ${ex.createdBy} this request?` : "Are you sure you want to reject this request?";
+    setSelectedData(ex);
+    const message = action === "approve"
+      ? `Are you sure you want to Approve ${ex.createdBy}'s request?`
+      : "Are you sure you want to Reject this request?";
     setModalMessage(message);
-    setOpenModal(true); // Open modal when action is clicked
+    setOpenConfirmModal(true);
   };
+
 
   const handleConfirm = async () => {
     if (!currentAction || !selectedData) return;
@@ -137,21 +142,19 @@ export function DetailApproval() {
     };
 
     try {
-      // Call API to finalize approval
       const response = await finalizeApprovalData(ex.transactionID, formData);
-
-      // Set the modal message based on the response
-      if (response.statusCode === 200) {
-        setModalMessage("Request has been successfully processed.");
-      } else {
-        setModalMessage(response.message || "Something went wrong.");
-      }
-    } catch (error) {
-      setModalMessage("Something went wrong.");
+      setModalMessage(response.message || "Request has been successfully processed.");
+    } catch (error: any) {
+      console.error("Approval error:", error);
+      setModalMessage(error.message || "Something went wrong.");
+    } finally {
+      // Tutup confirm modal dan buka message modal
+      setOpenConfirmModal(false);
+      setOpenMessageModal(true);
     }
-
-    setOpenModal(false); // Keep the modal open
+    setRedirectTo("/pinjam-ruangan/approval");
   };
+
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -321,8 +324,9 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      {(role.toLowerCase() === "admin" && jabatan !== "Bidang Sarpen") ||
-                        (role.toLowerCase() === "majelis" && jabatan === "Bidang Sarpen") ? (
+                      {((role.toLowerCase() === "admin" && jabatan !== "Bidang Sarpen") ||
+                        (role.toLowerCase() === "majelis" && jabatan === "Bidang Sarpen")) &&
+                        ex.status?.toLowerCase() === "pending" ? (
                         <Box
                           display="flex"
                           flexDirection="row"
@@ -360,10 +364,18 @@ export function DetailApproval() {
           </Table>
         </TableContainer>
         <ConfirmationModal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
+          open={openConfirmModal}
+          onClose={() => setOpenConfirmModal(false)}
           onConfirm={handleConfirm}
           message={modalMessage}
+        />
+
+        <MessageModal
+          open={openMessageModal}
+          onConfirm={handleModalConfirm}
+          onClose={() => setOpenMessageModal(false)}
+          message={modalMessage}
+          redirectTo={redirectTo}
         />
         <InputLabel
           sx={{

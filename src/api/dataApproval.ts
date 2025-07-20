@@ -18,25 +18,26 @@ export const fetchApprovalByDate = (uniqueCombination: string): Promise<ApiRespo
 };
 
 
-export const finalizeApprovalData = (id: number, formData: any): Promise<ApiResponse<boolean>> => {
-  console.log("Finalize Data form data:", formData);  // Ensure this logs the expected object
 
+export const finalizeApprovalData = (
+  id: number,
+  formData: any
+): Promise<ApiResponse<boolean>> => {
   return apiClient
     .post(`${ApprovalAPI.finalizeApproval}/${id}`, formData)
     .then((response) => {
-      const responseData = response.data;
-      console.log(responseData);
-      return responseData; // Return the response if the request is successful
+      return response.data as ApiResponse<boolean>;
     })
     .catch((error) => {
-      console.error("Error updating data:", error);
-      if (error.response && error.response.data && error.response.data.message) {
-        return error.response.data.message;
-      }
+      const apiError = error.response?.data;
+      const err = new Error(apiError?.message || "Something went wrong");
+      (err as any).statusCode = apiError?.statusCode || 500;
 
-      throw new Error("An error occurred while processing the request.");
+      throw err;
     });
 };
+
+
 export const fetchDataApproval = async (
   page: number,
   pageSize: number,
@@ -50,7 +51,7 @@ export const fetchDataApproval = async (
     if (searchData) {
       queryParams.append("date", searchData);
     }
-    const apiUrl = `${ApprovalAPI.getListApproval}?${queryParams.toString()}`;    console.log("API URL:", apiUrl);
+    const apiUrl = `${ApprovalAPI.getListApproval}?${queryParams.toString()}`; console.log("API URL:", apiUrl);
 
     const response = await apiClient.get<ApiResponse<ReservationData[]>>(apiUrl);
 
