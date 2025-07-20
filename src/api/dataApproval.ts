@@ -47,15 +47,10 @@ export const fetchDataApproval = async (
       page: String(page + 1),
       pageSize: String(pageSize),
     });
-
-    console.log("Search Data:", searchData);  // Ensure searchData is passed correctly
     if (searchData) {
-      queryParams.append("date", searchData); // Append the date if searchData exists
+      queryParams.append("date", searchData);
     }
-
-    // Log the final API URL to ensure it's correct
-    const apiUrl = `${ApprovalAPI.getListApproval}?${queryParams.toString()}`;
-    console.log("API URL:", apiUrl);
+    const apiUrl = `${ApprovalAPI.getListApproval}?${queryParams.toString()}`;    console.log("API URL:", apiUrl);
 
     const response = await apiClient.get<ApiResponse<ReservationData[]>>(apiUrl);
 

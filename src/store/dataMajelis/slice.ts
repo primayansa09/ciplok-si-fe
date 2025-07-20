@@ -28,16 +28,18 @@ interface FetchParams {
   pageNumber: number;
   pageSize: number;
   searchTerm: string;
+  source:string;
 }
 
 export const fetchDataMajelis = createAsyncThunk(
   'dataMajelis/fetch',
   async (params: FetchParams, thunkAPI) => {
     try {
-      const { pageNumber, pageSize, searchTerm } = params;
+      const { pageNumber, pageSize,source, searchTerm } = params;
       const query = new URLSearchParams({
         pageNumber: pageNumber.toString(),
         pageSize: pageSize.toString(),
+        source:"",
         ...(searchTerm ? { search: searchTerm } : {}),
       }).toString();
       const url = `${DataMajelisAPI.getData}?${query}`;
@@ -76,6 +78,8 @@ const dataMajelisSlice = createSlice({
       .addCase(fetchDataMajelis.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.data = []; // <- inisialisasi data kosong saat error seperti BadRequest
+        state.totalData = 0;
       });
   },
 });

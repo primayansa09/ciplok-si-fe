@@ -16,6 +16,13 @@ export interface ListItem {
 
 export const sidebarMenu: ListItem[] = [
   {
+    name: "Jadwal",
+    icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
+    link: "/dashboard",
+    key: "Dashboard",
+    
+  },
+  {
     name: "Master Data",
     icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
     link: "/master-data",
@@ -23,7 +30,7 @@ export const sidebarMenu: ListItem[] = [
     collapseList: [
       {
         name: "Data Majelis",
-        icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }}/>,
+        icon: <InventoryIcon sx={{ ...layoutPrivateStyle.sideMenuIcon, color: "#fff" }} />,
         link: "/master-data/data-majelis",
         key: "Data Majelis",
       },

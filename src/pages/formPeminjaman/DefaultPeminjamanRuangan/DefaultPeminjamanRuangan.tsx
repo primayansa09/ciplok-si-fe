@@ -24,6 +24,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchRequestData } from "../../../api/dataRequestForm";
+import EditIcon from "@mui/icons-material/Edit";
 
 export function DefaultPeminjamanRuangan() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export function DefaultPeminjamanRuangan() {
     navigate("/manage-peminjaman-ruangan", { replace: true });
   };
 
-  const clickViewData = (item: Data) => {
+  const clickEdit = (item: Data) => {
     navigate("/manage-peminjaman-ruangan", {
       state: {
         itemData: item,
@@ -64,6 +65,16 @@ export function DefaultPeminjamanRuangan() {
     });
   };
 
+
+  const clickViewData = (item: Data) => {
+    navigate("/manage-peminjaman-ruangan", {
+      state: {
+        itemData: item,
+        mode: "View",
+        IsEdit: true,
+      },
+    });
+  };
   const handleDelete = () => {
     console.log("Data dihapus!");
     setOpen(false);
@@ -292,11 +303,20 @@ export function DefaultPeminjamanRuangan() {
                         gap={1}
                       >
                         <InputLabel
-                          onClick={() => clickViewData(ex)}
+                          onClick={() => clickEdit(ex)}
                           sx={{
                             ...layoutPrivateStyle.manageTitleAction,
                             cursor: "pointer",
                             marginBottom: "5px",
+                          }}
+                        >
+                          <EditIcon />
+                        </InputLabel>
+                        <InputLabel
+                          onClick={() => clickViewData(ex)}
+                          sx={{
+                            ...layoutPrivateStyle.manageTitleAction,
+                            cursor: "pointer",
                           }}
                         >
                           <VisibilityIcon />

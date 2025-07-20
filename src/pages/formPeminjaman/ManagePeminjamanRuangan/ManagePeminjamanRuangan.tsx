@@ -24,9 +24,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import VerticalAlignBottomIcon from "@mui/icons-material/VerticalAlignBottom";
 import HeaderSection from "../../../components/commponentHeader/Header";
@@ -101,7 +98,7 @@ export function ManagePeminjamanRuangan() {
     };
     fetchData();
     const fetchDataMJ = async () => {
-      const response = await fetchDataMajelis();
+      const response = await fetchDataMajelis(1,10,"dropdown");
       setMajelisData(response.data)
     }
     fetchDataMJ();
@@ -138,8 +135,8 @@ export function ManagePeminjamanRuangan() {
           return existingSub;
         }
         return {
-          bobot:matchingCriteria.bobot,
-          parameter:matchingCriteria.parameter === "Maksimal" ? true : false,
+          bobot: matchingCriteria.bobot,
+          parameter: matchingCriteria.parameter === "Maksimal" ? true : false,
           criteriaID: matchingCriteria.idHeaderCriteria,
           subCriteriaID: selectedSub.idSubCriteria.toString(),
           subCriteriaName: selectedSub.subCriteriaName,
@@ -176,10 +173,10 @@ export function ManagePeminjamanRuangan() {
 
   const handleTanggalPemakaian = (newValue: Dayjs | null) => {
     setTanggalPemakaian(newValue);
-     setFormPeminjaman({
-        ...formPeminjaman,
-        reservationDate: newValue!.toDate(),
-      });
+    setFormPeminjaman({
+      ...formPeminjaman,
+      reservationDate: newValue!.toDate(),
+    });
   };
 
 
@@ -194,7 +191,7 @@ export function ManagePeminjamanRuangan() {
     if (!selectedSubData) return;
 
     const newDetail = {
-      idTrDetail:selectedSubData.idTrDetail,
+      idTrDetail: selectedSubData.idTrDetail,
       criteriaName: criteria.criteriaName,
       criteriaCode: criteria.criteriaCode,
       bobot: criteria.bobot,
@@ -309,6 +306,7 @@ export function ManagePeminjamanRuangan() {
                   format="DD-MMMM-YYYY"
                   slotProps={{
                     textField: {
+                      disabled: mode === 'View',
                       size: "small",
                       fullWidth: true,
                       error: !!errors.tanggalPemakaian,
@@ -354,6 +352,7 @@ export function ManagePeminjamanRuangan() {
                     textField: {
                       size: "small",
                       fullWidth: true,
+                      disabled: mode === 'View',
                       error: !!errors.jamMulaiPemakaian,
                       helperText: errors.jamMulaiPemakaian
                         ? "Jam Mulai Pemakaian Wajib diisi"
@@ -379,6 +378,7 @@ export function ManagePeminjamanRuangan() {
               id="demo-simple-select"
               style={{ width: "100%" }}
               size="small"
+              disabled={mode === "View"}
               value={formPeminjaman.roomName}
               onChange={(e) =>
                 setFormPeminjaman({
@@ -386,6 +386,7 @@ export function ManagePeminjamanRuangan() {
                   roomName: e.target.value,
                 })
               }
+
             >
               {ruangan.map((data, index) => (
                 <MenuItem key={index} value={data.descriptionSettings}>
@@ -420,6 +421,7 @@ export function ManagePeminjamanRuangan() {
                   mjRequest: e.target.value,
                 })
               }
+              disabled={mode === "View"}
             >
               {majelisData.map((data, index) => (
                 <MenuItem key={data.userID} value={data.fullName}>
@@ -491,7 +493,7 @@ export function ManagePeminjamanRuangan() {
             </Grid>
           </Grid>
         )}
-        {IsEdit && (<Grid container spacing={1} alignItems={"center"} marginTop={2}>
+        {/* {IsEdit && (<Grid container spacing={1} alignItems={"center"} marginTop={2}>
           <Grid size={6}>
             <Button
               type="submit"
@@ -513,7 +515,7 @@ export function ManagePeminjamanRuangan() {
             </Button>
           </Grid>
         </Grid>)
-        }
+        } */}
 
 
         < Grid container spacing={2} alignItems={"center"} marginTop={2}>
@@ -533,6 +535,7 @@ export function ManagePeminjamanRuangan() {
               fullWidth
               multiline
               rows={10}
+              disabled={mode === 'View'}
               error={errors.deskripsi}
               helperText={errors.deskripsi ? "Deskripsi Wajib diisi" : ""}
               InputProps={{
@@ -608,6 +611,7 @@ export function ManagePeminjamanRuangan() {
                       onChange={(e) => handleSubCriteriaChange(criteria, Number(e.target.value))}
                       displayEmpty
                       style={{ width: "100%" }}
+                      disabled={mode === "View"}
                     >
                       <MenuItem disabled value="">
                         Pilih Sub Kriteria
@@ -632,33 +636,52 @@ export function ManagePeminjamanRuangan() {
           alignItems={"center"}
           marginTop={2}
         >
-          <Grid size={2}>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{ ...layoutPrivateStyle.buttonSubmit, width: "100%" }}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
-            <MessageModal
-              open={openModal}
-              onClose={closeModal}
-              onConfirm={handleModalConfirm}
-              message={modalMessage}
-              redirectTo={redirectTo}
-            />
-          </Grid>
-          <Grid size={2}>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{ ...layoutPrivateStyle.buttonCancel, width: "100%" }}
-              onClick={clickCancel}
-            >
-              Cancel
-            </Button>
-          </Grid>
+          {mode !== "View" ? (
+            <>
+              <Grid size={2}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ ...layoutPrivateStyle.buttonSubmit, width: "100%" }}
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </Button>
+                <MessageModal
+                  open={openModal}
+                  onClose={closeModal}
+                  onConfirm={handleModalConfirm}
+                  message={modalMessage}
+                  redirectTo={redirectTo}
+                />
+              </Grid>
+
+              <Grid size={2}>
+                <Button
+                  type="button"
+                  variant="contained"
+                  sx={{ ...layoutPrivateStyle.buttonCancel, width: "100%" }}
+                  onClick={clickCancel}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+            </>
+          ) : (
+            <Grid size={2}>
+              <Button
+                type="button"
+                variant="contained"
+                sx={{ ...layoutPrivateStyle.buttonCancel, width: "100%" }}
+                onClick={clickCancel}
+              >
+                Cancel
+              </Button>
+            </Grid>
+          )}
+
+
+
         </Grid>
       </Paper>
     </Stack >

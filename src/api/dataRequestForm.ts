@@ -9,7 +9,7 @@ export const fetchRequestData = async (page: number, pageSize: number): Promise<
   try {
     const response = await apiClient.get<ApiResponse<Data[]>>(`${RequestFormAPI.getData}?${page + 1}&pageSize=${pageSize}`);
     if (response.data.statusCode === 200) {
-      return response.data; 
+      return response.data;
     } else {
       console.error(`Error: ${response.data.message}`);
       return {
@@ -66,11 +66,21 @@ export const updateFromRequest = (transactionID: number, formData: DataInsert): 
 };
 
 
-export const fetchDataMajelis = async (): Promise<ApiResponse<DataMJ[]>> => {
+export const fetchDataMajelis = async (pageNumber: number, pageSize: number, source: string): Promise<ApiResponse<DataMJ[]>> => {
   try {
-    const response = await apiClient.post<ApiResponse<DataMJ[]>>(DataMajelisAPI.getData);
+    const queryParams = new URLSearchParams({
+      page: String(pageNumber + 1),
+      pageSize: String(pageSize),
+    });
+    if (source) {
+      queryParams.append("dropdown", source);
+    }
+    console.log(queryParams)
+    const apiUrl = `${DataMajelisAPI.getData}?${queryParams.toString()}`;
+
+    const response = await apiClient.post<ApiResponse<DataMJ[]>>(apiUrl);
     if (response.data.statusCode === 200) {
-      return response.data; 
+      return response.data;
     } else {
       console.error(`Error: ${response.data.message}`);
       return {

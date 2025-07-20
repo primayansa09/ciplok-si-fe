@@ -20,21 +20,25 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import { DataMajelis } from "../../../store/dataMajelis/type";
-import ConfirmDeleteModal from "../../../components/Modal/ConfirmationModal";
+import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store";
 import { format } from "date-fns";
 import { fetchDataMajelis } from "../../../store/dataMajelis/slice";
-import ConfirmDownloadModal from "../../../components/Modal/ConfirmModalDownload";
-import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 
 export function DefaultDataMajelis() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { data, loading, error, pageNumber, pageSize, totalPages, totalData } = useSelector(
-    (state: RootState) => state.dataMajelis
-  );
+  const {
+    data,
+    loading,
+    error,
+    pageNumber,
+    pageSize,
+    totalPages,
+    totalData,
+  } = useSelector((state: RootState) => state.dataMajelis);
 
   const [open, setOpen] = useState(false);
   const [searchData, setSearchData] = useState("");
@@ -47,23 +51,27 @@ export function DefaultDataMajelis() {
       fetchDataMajelis({
         pageNumber: page + 1,
         pageSize: rowsPerPage,
+        source:"",
         searchTerm: searchData,
       })
     );
   }, [dispatch, page, rowsPerPage, searchData]);
 
   useEffect(() => {
-    if (data) {
+    if (data && !error) {
       const filtered = data.filter((item) =>
         item.codePnt?.toLowerCase().includes(searchData.toLowerCase())
       );
       setFilteredData(filtered);
+    } else {
+      setFilteredData([]);
     }
-  }, [data, searchData]);
+  }, [data, searchData, error]);
 
   useEffect(() => {
-    setPage(pageNumber - 1); // karena redux pakai 1-based, MUI pakai 0-based
+    setPage(pageNumber - 1);
   }, [pageNumber]);
+
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -83,8 +91,6 @@ export function DefaultDataMajelis() {
   };
 
   const clickEditData = (item: DataMajelis) => {
-
-    console.log(item)
     navigate("/manage-majelis", {
       state: {
         itemData: item,
@@ -100,7 +106,6 @@ export function DefaultDataMajelis() {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <Stack sx={layoutPrivateStyle.fixHeader}>
@@ -112,7 +117,7 @@ export function DefaultDataMajelis() {
       </InputLabel>
       <Paper style={{ padding: 16 }}>
         <Grid container spacing={2} alignItems={"center"}>
-          <Grid size={8.8}>
+          <Grid size={9}>
             <Button
               variant="contained"
               sx={layoutPrivateStyle.buttonAdd}
@@ -147,7 +152,7 @@ export function DefaultDataMajelis() {
           sx={layoutPrivateStyle.manageTableContainer}
           style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}
         >
-          <Table sx={{ minWidth: 720 }} size="small" aria-label="a dense table">
+          <Table sx={{ minWidth: 720 }} size="small">
             <TableHead sx={layoutPrivateStyle.moduleTableHead}>
               <TableRow sx={layoutPrivateStyle.manageTableRow}>
                 {[
@@ -174,16 +179,9 @@ export function DefaultDataMajelis() {
               </TableRow>
             </TableHead>
             <TableBody sx={{ border: 1 }}>
-              {data.length > 0 ? (
-                data.map((ex) => (
-                  <TableRow
-                    key={ex.codePnt}
-                    sx={{
-                      "&:last-child td, &:last-child th": {
-                        border: 0,
-                      },
-                    }}
-                  >
+              {filteredData.length > 0 ? (
+                filteredData.map((ex) => (
+                  <TableRow key={ex.codePnt}>
                     <TableCell sx={layoutPrivateStyle.manageTableCell}>
                       {ex.codePnt}
                     </TableCell>
@@ -253,7 +251,7 @@ export function DefaultDataMajelis() {
                         >
                           <EditIcon />
                         </InputLabel>
-                        <InputLabel
+                        {/* <InputLabel
                           onClick={() => setOpen(true)}
                           sx={{
                             ...layoutPrivateStyle.manageTitleAction,
@@ -267,14 +265,13 @@ export function DefaultDataMajelis() {
                           onClose={() => setOpen(false)}
                           onConfirm={handleDelete}
                           message=""
-                          // buttonText="ok"
-                        />
+                        /> */}
                       </Box>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
-                <TableRow sx={layoutPrivateStyle.manageTableRow}>
+                <TableRow>
                   <TableCell colSpan={8} align="center">
                     No Data Available.
                   </TableCell>
@@ -283,6 +280,7 @@ export function DefaultDataMajelis() {
             </TableBody>
           </Table>
         </TableContainer>
+
         <Box display="flex" justifyContent="flex-start" mt={2}>
           <TablePagination
             count={totalData}

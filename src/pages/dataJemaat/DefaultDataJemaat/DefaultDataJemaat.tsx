@@ -172,7 +172,7 @@ export function DefaultDataJemaat() {
                         >
                           <EditIcon />
                         </InputLabel>
-                        <InputLabel
+                        {/* <InputLabel
                           onClick={() => setOpen(true)}
                           sx={{ ...layoutPrivateStyle.manageTitleAction, cursor: "pointer" }}
                         >
@@ -183,7 +183,7 @@ export function DefaultDataJemaat() {
                           onClose={() => setOpen(false)}
                           onConfirm={handleDelete}
                           message=""
-                        />
+                        /> */}
                       </Box>
                     </TableCell>
                   </TableRow>

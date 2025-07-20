@@ -22,6 +22,8 @@ import { fetchApprovalByDate, finalizeApprovalData } from "../../../api/dataAppr
 import { FinalizeApproval, ReservationData, ScoreData, } from "../../../store/formPeminjaman/type";
 import ConfirmationModal from "../../../components/Modal/ConfirmationModal";
 import MessageModal from "../../../components/Modal/MessageModal";  // Ensure you are importing the MessageModal
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 
 
 export function DetailApproval() {
@@ -44,6 +46,10 @@ export function DetailApproval() {
 
   const [selectedData, setSelectedData] = useState<ReservationData | null>(null);
   const [buttonText, setButtonText] = useState("Ok");  // State to control button text in the modal
+
+  const role = useSelector((state: RootState) => state.auth.roleName);
+  const jabatan = useSelector((state: RootState) => state.auth.jabatanPenatua);
+
 
   const excludedHeaders = [
     "transactionID",
@@ -113,12 +119,12 @@ export function DetailApproval() {
   const handleApprovalClick = (action: "approve" | "reject", ex: ReservationData) => {
     setCurrentAction(action);
     setSelectedData(ex); // Set the selected data for modal
-    const message = action === "approve" ?`Are you sure you want to Approve  ${ex.createdBy} this request?` : "Are you sure you want to reject this request?";
+    const message = action === "approve" ? `Are you sure you want to Approve  ${ex.createdBy} this request?` : "Are you sure you want to reject this request?";
     setModalMessage(message);
     setOpenModal(true); // Open modal when action is clicked
   };
 
-   const handleConfirm = async () => {
+  const handleConfirm = async () => {
     if (!currentAction || !selectedData) return;
 
     const ex = selectedData;
@@ -315,26 +321,30 @@ export function DetailApproval() {
                         textAlign: "center",
                       }}
                     >
-                      <Box
-                        display="flex"
-                        flexDirection="row"
-                        justifyContent="center"
-                        alignItems="center"
-                        gap={2}
-                      >
-                        <InputLabel
-                          sx={{ cursor: "pointer" }}
-                          onClick={() => handleApprovalClick("approve", ex)} // Passing the entire ex object
+                      {(role.toLowerCase() === "admin" && jabatan !== "Bidang Sarpen") ||
+                        (role.toLowerCase() === "majelis" && jabatan === "Bidang Sarpen") ? (
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          justifyContent="center"
+                          alignItems="center"
+                          gap={2}
                         >
-                          <DoneIcon style={{ color: "green" }} />
-                        </InputLabel>
-                        <InputLabel
-                          sx={{ cursor: "pointer" }}
-                          onClick={() => handleApprovalClick("reject", ex)} // Passing the entire ex object
-                        >
-                          <CancelIcon style={{ color: "red" }} />
-                        </InputLabel>
-                      </Box>
+                          <InputLabel
+                            sx={{ cursor: "pointer" }}
+                            onClick={() => handleApprovalClick("approve", ex)}
+                          >
+                            <DoneIcon style={{ color: "green" }} />
+                          </InputLabel>
+                          <InputLabel
+                            sx={{ cursor: "pointer" }}
+                            onClick={() => handleApprovalClick("reject", ex)}
+                          >
+                            <CancelIcon style={{ color: "red" }} />
+                          </InputLabel>
+                        </Box>
+                      ) : null}
+
                     </TableCell>
                   </TableRow>
                 ))
@@ -349,14 +359,12 @@ export function DetailApproval() {
             </TableBody>
           </Table>
         </TableContainer>
-       <ConfirmationModal
+        <ConfirmationModal
           open={openModal}
-          onClose={() => setOpenModal(false)}  // Close modal when user clicks "No"
-          onConfirm={handleConfirm}  // Handle confirmation when user clicks "Yes"
-          message={modalMessage}  // Pass the success/error message to the modal
+          onClose={() => setOpenModal(false)}
+          onConfirm={handleConfirm}
+          message={modalMessage}
         />
-
-        {/* Table Penunjang Keputusan */}
         <InputLabel
           sx={{
             ...layoutPrivateStyle.manageTitleHeader,

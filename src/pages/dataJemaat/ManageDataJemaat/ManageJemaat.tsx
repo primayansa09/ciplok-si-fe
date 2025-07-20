@@ -175,7 +175,7 @@ export function ManageJemaat() {
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2.2}>
             <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
-              Email <span style={{ color: "red" }}>*</span>
+              Username <span style={{ color: "red" }}>*</span>
             </InputLabel>
           </Grid>
           <Grid size={4}>
