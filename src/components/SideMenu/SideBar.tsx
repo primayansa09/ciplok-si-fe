@@ -246,71 +246,84 @@ const Sidebar: React.FC = () => {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List>
-            {sidebarMenu
-              .filter((item) => {
-                // Only show items based on role
-                if (role === 'user') {
-                  // Return only specific items for 'user' role
-                  return item.key === 'Pinjam Ruangan' || item.key === 'Master Data';
+          {sidebarMenu
+            .filter((item) => {
+              // If the role is 'Majelis', hide 'Data Kriteria dan Sub Kriteria' from 'Master Data'
+              if (role === 'Majelis') {
+                if (item.key === 'Master Data') {
+                  item.collapseList = item.collapseList?.filter(subItem => subItem.key !== 'Data Kriteria dan Sub Kriteria');
                 }
-                // Return all items for other roles
-                return true;
-              })
-              .map((item) => (
-                <Stack key={item.key}>
-                  <ListItemButton
-                    onClick={() => handleParentClick(item)}
-                    sx={{
-                      backgroundColor:
-                        location.pathname.startsWith(item.link) && !item.collapseList
-                          ? '#DDA853'
-                          : 'inherit',
-                    }}
-                  >
-                    <ListItemIcon>{item.icon}</ListItemIcon>
-                    <ListItemText primary={item.name} sx={{ color: 'white' }} />
-                    {item.collapseList ? (
-                      openCollapse === item.name ? (
-                        <ExpandLess sx={{ color: 'white', width: '35px', height: '35px' }} />
-                      ) : (
-                        <ExpandMore sx={{ color: 'white', width: '35px', height: '35px' }} />
-                      )
-                    ) : null}
-                  </ListItemButton>
-                  {item.collapseList && (
-                    <Collapse in={openCollapse === item.name} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        {item.collapseList
-                          .filter((subItem) => {
-                            // Show only specific subItems based on role
-                            if (role === 'User') {
-                              return (
-                                subItem.key === 'Form Peminjaman' || subItem.key === 'Data Jemaat'
-                              );
-                            }
-                            return true;
-                          })
-                          .map((subItem) => (
-                            <ListItemButton
-                              key={subItem.key}
-                              sx={{
-                                pl: 4,
-                                backgroundColor:
-                                  location.pathname === subItem.link ? '#DDA853' : 'inherit',
-                              }}
-                              onClick={() => handleChildClick(subItem.link)}
-                            >
-                              <ListItemIcon>{subItem.icon}</ListItemIcon>
-                              <ListItemText primary={subItem.name} sx={{ color: 'white' }} />
-                            </ListItemButton>
-                          ))}
-                      </List>
-                    </Collapse>
-                  )}
-                </Stack>
-              ))}
-          </List>;
+              }
+
+              // If the role is 'Admin', ensure 'Data Kriteria dan Sub Kriteria' is visible
+              if (role === 'Admin') {
+                if (item.key === 'Master Data') {
+                  item.collapseList = item.collapseList?.filter(subItem => subItem.key === 'Data Kriteria dan Sub Kriteria' || subItem.key !== 'Data Kriteria dan Sub Kriteria');
+                }
+              }
+
+              // If the role is 'User', show only 'Dashboard' (Jadwal) and 'Pinjam Ruangan'
+              if (role === 'User') {
+                return item.key === 'Dashboard' || item.key === 'Pinjam Ruangan';  // Assuming 'Dashboard' is the 'Jadwal' item
+              }
+
+              // Return all items for other roles
+              return true;
+            })
+            .map((item) => (
+              <Stack key={item.key}>
+                <ListItemButton
+                  onClick={() => handleParentClick(item)}
+                  sx={{
+                    backgroundColor:
+                      location.pathname.startsWith(item.link) && !item.collapseList
+                        ? '#DDA853'
+                        : 'inherit',
+                  }}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.name} sx={{ color: 'white' }} />
+                  {item.collapseList ? (
+                    openCollapse === item.name ? (
+                      <ExpandLess sx={{ color: 'white', width: '35px', height: '35px' }} />
+                    ) : (
+                      <ExpandMore sx={{ color: 'white', width: '35px', height: '35px' }} />
+                    )
+                  ) : null}
+                </ListItemButton>
+                {item.collapseList && (
+                  <Collapse in={openCollapse === item.name} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {item.collapseList
+                        .filter((subItem) => {
+                          // If role is 'User', show only specific subItems based on role
+                          if (role === 'User') {
+                            return (
+                              subItem.key === 'Form Peminjaman' || subItem.key === 'Data Jemaat'
+                            );
+                          }
+                          return true;
+                        })
+                        .map((subItem) => (
+                          <ListItemButton
+                            key={subItem.key}
+                            sx={{
+                              pl: 4,
+                              backgroundColor:
+                                location.pathname === subItem.link ? '#DDA853' : 'inherit',
+                            }}
+                            onClick={() => handleChildClick(subItem.link)}
+                          >
+                            <ListItemIcon>{subItem.icon}</ListItemIcon>
+                            <ListItemText primary={subItem.name} sx={{ color: 'white' }} />
+                          </ListItemButton>
+                        ))}
+                    </List>
+                  </Collapse>
+                )}
+              </Stack>
+            ))}
+
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
