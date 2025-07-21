@@ -42,7 +42,7 @@ export function Login() {
           <Typography variant="h5" textAlign="center" mb={2}>Login</Typography>
           <Grid container spacing={2}>
             <Grid size={12}>
-              <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth size="small" />
+              <TextField label="Username" type="username" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth size="small" />
             </Grid>
             <Grid size={12}>
               <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth size="small" />

@@ -38,7 +38,7 @@ export type DataInsert = {
     status: string | null;
     startTime: string | null;
     roomName: string | null;
-    reservationDate: Date;
+    reservationDate: Date | null;
     createdDate: Date;
     createdBy: string | null;
     description: string | null;

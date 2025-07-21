@@ -143,6 +143,7 @@ const Sidebar: React.FC = () => {
     navigate("/dashboard");
   };
 
+  console.log(sidebarMenu)
   return (
     <>
       <Box sx={{ display: "flex" }}>

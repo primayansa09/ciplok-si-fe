@@ -25,6 +25,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { fetchRequestData } from "../../../api/dataRequestForm";
 import EditIcon from "@mui/icons-material/Edit";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 
 export function DefaultPeminjamanRuangan() {
   const navigate = useNavigate();
@@ -36,6 +38,7 @@ export function DefaultPeminjamanRuangan() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchData, setSearchData] = useState("");
   const [totalData, setTotalData] = useState(0);
+  const role = useSelector((state: RootState) => state.auth.roleName);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -302,16 +305,18 @@ export function DefaultPeminjamanRuangan() {
                         justifyContent="center"
                         gap={1}
                       >
-                        <InputLabel
-                          onClick={() => clickEdit(ex)}
-                          sx={{
-                            ...layoutPrivateStyle.manageTitleAction,
-                            cursor: "pointer",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <EditIcon />
-                        </InputLabel>
+                        {role === "Admin" && (
+                          <InputLabel
+                            onClick={() => clickEdit(ex)}
+                            sx={{
+                              ...layoutPrivateStyle.manageTitleAction,
+                              cursor: "pointer",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            <EditIcon />
+                          </InputLabel>
+                        )}
                         <InputLabel
                           onClick={() => clickViewData(ex)}
                           sx={{

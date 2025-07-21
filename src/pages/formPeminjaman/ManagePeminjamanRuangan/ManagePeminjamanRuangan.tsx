@@ -15,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  FormControl,
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -64,7 +65,7 @@ export function ManagePeminjamanRuangan() {
     status: "",
     startTime: "",
     roomName: "",
-    reservationDate: new Date(),
+    reservationDate: null,
     createdDate: new Date(),
     createdBy: "",
     description: "",
@@ -76,17 +77,12 @@ export function ManagePeminjamanRuangan() {
   const [criteriaData, setCriteriaData] = useState<Criteria[]>([]);
 
   const [errors, setErrors] = useState({
-    peminjam: false,
-    jenisKegiatan: false,
-    ruangan: false,
-    durasi: false,
-    tanggalPemakaian: false,
-    tanggalPengajuan: false,
-    jamMulaiPemakaian: false,
-    jumlahOrang: false,
-    mjMengetahui: false,
-    jemaatPeminjam: false,
-    deskripsi: false,
+    reservationDate: false,
+    startTime: false,
+    description: false,
+    roomName: false,
+    mjRequest: false,
+    subCriteriaList: [] as boolean[],
   });
 
 
@@ -98,7 +94,7 @@ export function ManagePeminjamanRuangan() {
     };
     fetchData();
     const fetchDataMJ = async () => {
-      const response = await fetchDataMajelis(1,10,"dropdown");
+      const response = await fetchDataMajelis(1, 10, "dropdown");
       setMajelisData(response.data)
     }
     fetchDataMJ();
@@ -220,13 +216,46 @@ export function ManagePeminjamanRuangan() {
   };
 
   const handleSubmit = async () => {
+    // Validate main fields
+    const newErrors = {
+      reservationDate: !formPeminjaman.reservationDate,
+      startTime: !formPeminjaman.startTime,
+      description: formPeminjaman.description?.trim() === "" || formPeminjaman.description === null,
+      roomName: formPeminjaman.roomName?.trim() === "" || formPeminjaman.roomName === null,
+      mjRequest: formPeminjaman.mjRequest?.trim() === "" || formPeminjaman.mjRequest === null,
+    };
+    const subCriteriaErrors = formPeminjaman.subCriteriaList.map((item) => {
+      return item.subCriteriaID === "" || item.subCriteriaID === null;
+    });
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ...newErrors,
+      subCriteriaList: subCriteriaErrors,
+      // subCriteriaListEmpty: isSubCriteriaListEmpty,
+    }));
+    const isValid = !Object.values(newErrors).includes(true);
+    if (!isValid) {
+      return;
+    }
+
+    const isSubCriteriaListEmpty = formPeminjaman.subCriteriaList.length === 0;
+    const isValidArray = !subCriteriaErrors.includes(true) && !isSubCriteriaListEmpty
+    if (!isValidArray) {
+      setModalMessage("Sub Criteria Name Harus di Isi");
+      setOpenModal(true);
+      return;
+    }
 
     try {
       let response;
-      console.log(formPeminjaman)
+      console.log(formPeminjaman);
+
+      // Check if this is a new transaction (ID is 0 or null) or an update
       if (formPeminjaman.transactionID === 0 || formPeminjaman.transactionID === null) {
         response = await createFormRequest(formPeminjaman);
         if (response.statusCode === 200) {
+          // Reset the form and show a success message
           setFormPeminjaman({
             transactionID: 0,
             status: "",
@@ -247,6 +276,7 @@ export function ManagePeminjamanRuangan() {
       } else {
         response = await updateFromRequest(formPeminjaman.transactionID, formPeminjaman);
         if (response.statusCode === 200) {
+          // Reset the form and show a success message
           setFormPeminjaman({
             transactionID: 0,
             status: "",
@@ -269,7 +299,8 @@ export function ManagePeminjamanRuangan() {
       setModalMessage("An error occurred while submitting the form.");
       setOpenModal(true);
     }
-  }
+  };
+
 
   const closeModal = () => {
     setOpenModal(false);
@@ -304,13 +335,14 @@ export function ManagePeminjamanRuangan() {
                   value={tanggalPemakaian}
                   onChange={handleTanggalPemakaian}
                   format="DD-MMMM-YYYY"
+                  onError={(error) => setErrors({ ...errors, reservationDate: !!error })}
                   slotProps={{
                     textField: {
                       disabled: mode === 'View',
                       size: "small",
                       fullWidth: true,
-                      error: !!errors.tanggalPemakaian,
-                      helperText: errors.tanggalPemakaian
+                      error: errors.reservationDate,
+                      helperText: errors.reservationDate
                         ? "Tanggal Pemakaian Wajib diisi"
                         : "",
                     },
@@ -353,8 +385,8 @@ export function ManagePeminjamanRuangan() {
                       size: "small",
                       fullWidth: true,
                       disabled: mode === 'View',
-                      error: !!errors.jamMulaiPemakaian,
-                      helperText: errors.jamMulaiPemakaian
+                      error: !!errors.startTime,
+                      helperText: errors.startTime
                         ? "Jam Mulai Pemakaian Wajib diisi"
                         : "",
                     },
@@ -373,32 +405,34 @@ export function ManagePeminjamanRuangan() {
             >
               Ruangan <span style={{ color: "red" }}>*</span>
             </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              disabled={mode === "View"}
-              value={formPeminjaman.roomName}
-              onChange={(e) =>
-                setFormPeminjaman({
-                  ...formPeminjaman,
-                  roomName: e.target.value,
-                })
-              }
+            <FormControl sx={{ width: "100%" }} error={errors.roomName}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                style={{ width: "100%" }}
+                size="small"
+                disabled={mode === "View"}
+                value={formPeminjaman.roomName}
+                onChange={(e) =>
+                  setFormPeminjaman({
+                    ...formPeminjaman,
+                    roomName: e.target.value,
+                  })
+                }
 
-            >
-              {ruangan.map((data, index) => (
-                <MenuItem key={index} value={data.descriptionSettings}>
-                  {data.descriptionSettings}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.ruangan && (
-              <FormHelperText>
-                {errors.ruangan || "Ruangan Wajib diisi"}
-              </FormHelperText>
-            )}
+              >
+                {ruangan.map((data, index) => (
+                  <MenuItem key={index} value={data.descriptionSettings}>
+                    {data.descriptionSettings}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.roomName && (
+                <FormHelperText>
+                  {"Ruangan Wajib diisi"}
+                </FormHelperText>
+              )}
+            </FormControl>
           </Grid>
           <Grid size={6}>
             <InputLabel
@@ -409,31 +443,43 @@ export function ManagePeminjamanRuangan() {
             >
               MJ Mengetahui <span style={{ color: "red" }}>*</span>
             </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              style={{ width: "100%" }}
-              size="small"
-              value={formPeminjaman.mjRequest}
-              onChange={(e) =>
-                setFormPeminjaman({
-                  ...formPeminjaman,
-                  mjRequest: e.target.value,
-                })
-              }
-              disabled={mode === "View"}
-            >
-              {majelisData.map((data, index) => (
-                <MenuItem key={data.userID} value={data.fullName}>
-                  {data.fullName}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.mjMengetahui && (
-              <FormHelperText>
-                {errors.mjMengetahui || "MJ Mengetahui Wajib diisi"}
-              </FormHelperText>
-            )}
+            <FormControl sx={{ width: "100%" }} error={errors.roomName}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: errors.mjRequest ? "red" : "", // Red border on error
+                    "&:hover": {
+                      borderColor: errors.mjRequest ? "red" : "", // Red border on hover when error
+                    },
+                    "&.Mui-focused": {
+                      borderColor: errors.mjRequest ? "red" : "", // Red border when focused with error
+                    },
+                  },
+                }}
+                size="small"
+                value={formPeminjaman.mjRequest}
+                onChange={(e) =>
+                  setFormPeminjaman({
+                    ...formPeminjaman,
+                    mjRequest: e.target.value,
+                  })
+                }
+                disabled={mode === "View"}
+              >
+                {majelisData.map((data, index) => (
+                  <MenuItem key={data.userID} value={data.fullName}>
+                    {data.fullName}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.mjRequest && (
+                <FormHelperText>
+                  {"MJ Mengetahui Wajib diisi"}
+                </FormHelperText>
+              )}
+            </FormControl>
           </Grid>
         </Grid>
 
@@ -480,10 +526,7 @@ export function ManagePeminjamanRuangan() {
                       textField: {
                         size: "small",
                         fullWidth: true,
-                        error: !!errors.tanggalPemakaian,
-                        helperText: errors.tanggalPemakaian
-                          ? "Tanggal Pemakaian Wajib diisi"
-                          : "",
+
                       },
                     }}
                     disabled
@@ -536,8 +579,8 @@ export function ManagePeminjamanRuangan() {
               multiline
               rows={10}
               disabled={mode === 'View'}
-              error={errors.deskripsi}
-              helperText={errors.deskripsi ? "Deskripsi Wajib diisi" : ""}
+              error={errors.description}
+              helperText={errors.description ? "Deskripsi Wajib diisi" : ""}
               InputProps={{
                 sx: {
                   height: 200,
@@ -612,6 +655,7 @@ export function ManagePeminjamanRuangan() {
                       displayEmpty
                       style={{ width: "100%" }}
                       disabled={mode === "View"}
+                      error={errors.subCriteriaList[index]}  // Show error for invalid subCriteriaID
                     >
                       <MenuItem disabled value="">
                         Pilih Sub Kriteria
@@ -623,6 +667,9 @@ export function ManagePeminjamanRuangan() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {errors.subCriteriaList[index] && (
+                      <FormHelperText error>Sub Kriteria is required</FormHelperText>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

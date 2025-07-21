@@ -58,6 +58,8 @@ export type ValidateError = {
   criteriaName: boolean;
   bobot: boolean;
   parameter: boolean;
+  subCriteriaName:boolean;
+  subCriteriaBobot:boolean;
 };
 
 export interface LocationState {

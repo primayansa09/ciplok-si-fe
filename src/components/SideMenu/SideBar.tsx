@@ -101,7 +101,6 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [profileMenu, setProfileMenu] = useState(false);
 
-  const fullName = useSelector((state: RootState) => state.auth.fullName);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setProfileMenu(true);
@@ -138,6 +137,10 @@ const Sidebar: React.FC = () => {
   const handleChildClick = (link: string) => {
     navigate(link);
   };
+  const fullName = useSelector((state: RootState) => state.auth.fullName);
+  const role = useSelector((state: RootState) => state.auth.roleName)
+  const jabatan = useSelector((state: RootState) => state.auth.jabatanPenatua);
+  console.log(sidebarMenu)
 
   return (
     <>
@@ -244,57 +247,70 @@ const Sidebar: React.FC = () => {
           </DrawerHeader>
           <Divider />
           <List>
-            {sidebarMenu.map((item) => (
-              <Stack key={item.key}>
-                <ListItemButton
-                  onClick={() => handleParentClick(item)}
-                  sx={{
-                    backgroundColor:
-                      location.pathname.startsWith(item.link) &&
-                        !item.collapseList
-                        ? "#DDA853"
-                        : "inherit",
-                  }}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.name} sx={{ color: "white" }} />
-                  {item.collapseList ? (
-                    openCollapse === item.name ? (
-                      <ExpandLess sx={{ color: "white", width: "35px", height: "35px" }} />
-                    ) : (
-                      <ExpandMore sx={{ color: "white", width: "35px", height: "35px" }} />
-                    )
-                  ) : null}
-                </ListItemButton>
-                {item.collapseList && (
-                  <Collapse
-                    in={openCollapse === item.name}
-                    timeout="auto"
-                    unmountOnExit
+            {sidebarMenu
+              .filter((item) => {
+                // Only show items based on role
+                if (role === 'user') {
+                  // Return only specific items for 'user' role
+                  return item.key === 'Pinjam Ruangan' || item.key === 'Master Data';
+                }
+                // Return all items for other roles
+                return true;
+              })
+              .map((item) => (
+                <Stack key={item.key}>
+                  <ListItemButton
+                    onClick={() => handleParentClick(item)}
+                    sx={{
+                      backgroundColor:
+                        location.pathname.startsWith(item.link) && !item.collapseList
+                          ? '#DDA853'
+                          : 'inherit',
+                    }}
                   >
-                    <List component="div" disablePadding>
-                      {item.collapseList.map((subItem) => (
-                        <ListItemButton
-                          key={subItem.key}
-                          sx={{
-                            pl: 4,
-                            backgroundColor:
-                              location.pathname === subItem.link
-                                ? "#DDA853"
-                                : "inherit",
-                          }}
-                          onClick={() => handleChildClick(subItem.link)}
-                        >
-                          <ListItemIcon>{subItem.icon}</ListItemIcon>
-                          <ListItemText primary={subItem.name} sx={{ color: "white" }} />
-                        </ListItemButton>
-                      ))}
-                    </List>
-                  </Collapse>
-                )}
-              </Stack>
-            ))}
-          </List>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.name} sx={{ color: 'white' }} />
+                    {item.collapseList ? (
+                      openCollapse === item.name ? (
+                        <ExpandLess sx={{ color: 'white', width: '35px', height: '35px' }} />
+                      ) : (
+                        <ExpandMore sx={{ color: 'white', width: '35px', height: '35px' }} />
+                      )
+                    ) : null}
+                  </ListItemButton>
+                  {item.collapseList && (
+                    <Collapse in={openCollapse === item.name} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        {item.collapseList
+                          .filter((subItem) => {
+                            // Show only specific subItems based on role
+                            if (role === 'User') {
+                              return (
+                                subItem.key === 'Form Peminjaman' || subItem.key === 'Data Jemaat'
+                              );
+                            }
+                            return true;
+                          })
+                          .map((subItem) => (
+                            <ListItemButton
+                              key={subItem.key}
+                              sx={{
+                                pl: 4,
+                                backgroundColor:
+                                  location.pathname === subItem.link ? '#DDA853' : 'inherit',
+                              }}
+                              onClick={() => handleChildClick(subItem.link)}
+                            >
+                              <ListItemIcon>{subItem.icon}</ListItemIcon>
+                              <ListItemText primary={subItem.name} sx={{ color: 'white' }} />
+                            </ListItemButton>
+                          ))}
+                      </List>
+                    </Collapse>
+                  )}
+                </Stack>
+              ))}
+          </List>;
         </Drawer>
         <Main open={open}>
           <DrawerHeader />

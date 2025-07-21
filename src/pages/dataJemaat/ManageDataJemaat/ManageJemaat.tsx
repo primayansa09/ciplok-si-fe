@@ -12,6 +12,8 @@ import {
   IconButton,
   InputAdornment,
   Tooltip,
+  FormControl,
+  FormHelperText,
 } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import HeaderSection from "../../../components/commponentHeader/Header";
@@ -42,10 +44,13 @@ export function ManageJemaat() {
   });
 
   const [errors, setErrors] = useState({
-    namaPenatua: false,
-    alamatPenatua: false,
-    noTelepon: false,
-    noWhatsApp: false,
+    email: false,
+    anggotaKomisi: false,
+    password: false,
+    phoneNo: false,
+    fullName: false,
+    address: false,
+    alternatePhoneNo: false
   });
 
   // Password visibility states
@@ -69,6 +74,20 @@ export function ManageJemaat() {
 
   // Handle form submission (create or update)
   const handleSubmit = async () => {
+    const newErrors = {
+      email: formDataJemaat.email?.trim() === "" || formDataJemaat.email === null,
+      anggotaKomisi: formDataJemaat.anggotaKomisi?.trim() === "" || formDataJemaat.anggotaKomisi === null,
+      password: formDataJemaat.password?.trim() === "" || formDataJemaat.password === null,
+      phoneNo: formDataJemaat.phoneNo?.trim() === "" || formDataJemaat.phoneNo === null,
+      fullName: formDataJemaat.fullName?.trim() === "" || formDataJemaat.fullName === null,
+      address: formDataJemaat.address?.trim() === "" || formDataJemaat.address === null,
+      alternatePhoneNo: formDataJemaat.alternatePhoneNo?.trim() === "" || formDataJemaat.alternatePhoneNo === null
+    };
+    setErrors(newErrors);
+    const isValid = !Object.values(newErrors).includes(true);
+    if (!isValid) {
+      return;
+    }
     try {
       let response;
       if (formDataJemaat.userID == 0) {
@@ -166,8 +185,8 @@ export function ManageJemaat() {
                   fullName: e.target.value,
                 })
               }
-              error={errors.namaPenatua}
-              helperText={errors.namaPenatua ? "Nama Penatua Wajib diidi" : ""}
+              error={errors.fullName}
+              helperText={errors.fullName ? "Nama Lengkap Wajib di isi" : ""}
             />
           </Grid>
         </Grid>
@@ -191,8 +210,8 @@ export function ManageJemaat() {
                   email: e.target.value,
                 })
               }
-              error={errors.noTelepon}
-              helperText={errors.noTelepon ? "No Telepon Wajib diidi" : ""}
+              error={errors.email}
+              helperText={errors.email ? "Username Wajib di isi" : ""}
             />
           </Grid>
         </Grid>
@@ -209,6 +228,8 @@ export function ManageJemaat() {
               label="Password"
               variant="outlined"
               type={showPassword ? "text" : "password"}
+              error={errors.password}
+              helperText={errors.password ? "Password Wajib di isi" : ""}
               value={formDataJemaat.password}
               onChange={handlePasswordChange}
               sx={{ width: "250px" }}
@@ -240,24 +261,39 @@ export function ManageJemaat() {
             </InputLabel>
           </Grid>
           <Grid size={4}>
-            <Select
-              labelId="jabatanPenatua-label"
-              sx={{ width: "250px" }}
-              id="jabatanPenatua"
-              value={formDataJemaat.anggotaKomisi}
-              onChange={(e) =>
-                setFormDataJemaat({
-                  ...formDataJemaat,
-                  anggotaKomisi: e.target.value,
-                })
-              }
-            >
-              {anggotaKomisi.map((anggotaData, index) => (
-                <MenuItem key={index} value={anggotaData.descriptionSettings}>
-                  {anggotaData.descriptionSettings}
-                </MenuItem>
-              ))}
-            </Select>
+            <FormControl sx={{ width: "250px" }} error={errors.anggotaKomisi}>
+              <Select
+                labelId="jabatanPenatua-label"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: errors.anggotaKomisi ? "red" : "", // Red border on error
+                    "&:hover": {
+                      borderColor: errors.anggotaKomisi ? "red" : "", // Red border on hover when error
+                    },
+                    "&.Mui-focused": {
+                      borderColor: errors.anggotaKomisi ? "red" : "", // Red border when focused with error
+                    },
+                  },
+                }}
+                id="anggotaKomisi"
+                value={formDataJemaat.anggotaKomisi}
+                onChange={(e) =>
+                  setFormDataJemaat({
+                    ...formDataJemaat,
+                    anggotaKomisi: e.target.value,
+                  })
+                }
+              >
+                {anggotaKomisi.map((anggotaData, index) => (
+                  <MenuItem key={index} value={anggotaData.descriptionSettings}>
+                    {anggotaData.descriptionSettings}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.anggotaKomisi && (
+                <FormHelperText>{'Anggota Komisi wajib diisi'}</FormHelperText>
+              )}
+            </FormControl>
           </Grid>
         </Grid>
 
@@ -288,8 +324,8 @@ export function ManageJemaat() {
                   address: e.target.value,
                 })
               }
-              error={errors.alamatPenatua}
-              helperText={errors.alamatPenatua ? "Alamat Wajib diidi" : ""}
+              error={errors.address}
+              helperText={errors.address ? "Alamat Wajib di isi" : ""}
             />
           </Grid>
         </Grid>
@@ -313,8 +349,8 @@ export function ManageJemaat() {
                   phoneNo: e.target.value,
                 })
               }
-              error={errors.noWhatsApp}
-              helperText={errors.noWhatsApp ? "No WhatsApp Wajib diidi" : ""}
+              error={errors.phoneNo}
+              helperText={errors.phoneNo ? "No WhatsApp Wajib di isi" : ""}
             />
           </Grid>
         </Grid>
@@ -331,6 +367,8 @@ export function ManageJemaat() {
               variant="outlined"
               sx={{ width: "250px" }}
               size="small"
+              error={errors.alternatePhoneNo}
+              helperText={errors.alternatePhoneNo ? "Alternate Phone Wajib di isi" : ""}
               value={formDataJemaat.alternatePhoneNo}
               onChange={(e) =>
                 setFormDataJemaat({

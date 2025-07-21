@@ -40,8 +40,8 @@ export type DataInsert = {
     jabatanPenatua: string | null;
     alamatPenatua: string | null;
     phoneNo: string | null;
-    startDate: Date;
-    endDate: Date;
+    startDate: Date | null;
+    endDate: Date | null;
 };
 
 export type ValidateError = {

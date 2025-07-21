@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, Grid, Stack, TextField, InputLabel, Paper, CircularProgress, Select, MenuItem, Table, TableRow, TableBody, TableCell, TableHead } from "@mui/material";
+import { Button, Grid, Stack, TextField, InputLabel, Paper, CircularProgress, Select, MenuItem, Table, TableRow, TableBody, TableCell, TableHead, FormHelperText, FormControl } from "@mui/material";
 import { layoutPrivateStyle } from "../../../style/layout/private-route";
 import HeaderSection from "../../../components/commponentHeader/Header";
 import { DataInsert, DataUserMajelis } from "../../../store/dataMajelis/type";
@@ -25,12 +25,15 @@ export function ManageMajelis() {
     jabatanPenatua: "",
     alamatPenatua: "",
     phoneNo: "",
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: null,
+    endDate: null,
   });
   const [errors, setErrors] = useState({
+    codePnt: false,
     namaPenatua: false,
-    phoneNo: false,
+    startDate: false,
+    endDate: false,
+    jabatanPenatua: false
   });
   const [searchResults, setSearchResults] = useState<DataUserMajelis[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,9 +64,14 @@ export function ManageMajelis() {
   }, [IsEdit, itemData]);
 
   const handleSubmit = async () => {
+    console.log(formDataMajelis.startDate)
+    console.log(formDataMajelis.endDate)
     const newErrors = {
+      codePnt: formDataMajelis.codePnt?.trim() === "" || formDataMajelis.codePnt === null,
       namaPenatua: formDataMajelis.fullName?.trim() === "" || formDataMajelis.fullName === null,
-      phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
+      startDate: !formDataMajelis.startDate,
+      endDate: !formDataMajelis.endDate,
+      jabatanPenatua: formDataMajelis.jabatanPenatua?.trim() === "" || formDataMajelis.jabatanPenatua === null
     };
     setErrors(newErrors);
     const isValid = !Object.values(newErrors).includes(true);
@@ -148,10 +156,10 @@ export function ManageMajelis() {
       ...formDataMajelis,
       fullName: query,
     });
-    setErrors({
-      namaPenatua: query.trim() === "",
-      phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
-    });
+    // setErrors({
+    //   namaPenatua: query.trim() === "",
+    //   phoneNo: formDataMajelis.phoneNo?.trim() === "" || formDataMajelis.phoneNo === null,
+    // });
 
     if (query.trim() === "") {
       setSearchResults([]);
@@ -208,6 +216,8 @@ export function ManageMajelis() {
               sx={{ width: "250px" }}
               size="small"
               value={formDataMajelis.codePnt}
+              error={errors.codePnt}
+              helperText={errors.codePnt ? "Nama Penatua wajib diisi" : ""}
               onChange={(e) =>
                 setFormDataMajelis({
                   ...formDataMajelis,
@@ -280,26 +290,42 @@ export function ManageMajelis() {
             </InputLabel>
           </Grid>
           <Grid size={4}>
-            <Select
-              labelId="jabatanPenatua-label"
-              sx={{ width: "250px" }}
-              id="jabatanPenatua"
-              value={formDataMajelis.jabatanPenatua}
-              onChange={(e) =>
-                setFormDataMajelis({
-                  ...formDataMajelis,
-                  jabatanPenatua: e.target.value,
-                })
-              }
-            >
-              {jabatanPenatuaList.map((jabatan, index) => (
-                <MenuItem key={index} value={jabatan.descriptionSettings}>
-                  {jabatan.descriptionSettings}
-                </MenuItem>
-              ))}
-            </Select>
+            <FormControl sx={{ width: "250px" }} error={errors.jabatanPenatua}>
+              <Select
+                labelId="jabatanPenatua-label"
+                id="jabatanPenatua"
+                value={formDataMajelis.jabatanPenatua}
+                onChange={(e) =>
+                  setFormDataMajelis({
+                    ...formDataMajelis,
+                    jabatanPenatua: e.target.value,
+                  })
+                }
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: errors.jabatanPenatua ? "red" : "", // Red border on error
+                    "&:hover": {
+                      borderColor: errors.jabatanPenatua ? "red" : "", // Red border on hover when error
+                    },
+                    "&.Mui-focused": {
+                      borderColor: errors.jabatanPenatua ? "red" : "", // Red border when focused with error
+                    },
+                  },
+                }}
+              >
+                {jabatanPenatuaList.map((jabatan, index) => (
+                  <MenuItem key={index} value={jabatan.descriptionSettings}>
+                    {jabatan.descriptionSettings}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.jabatanPenatua && (
+                <FormHelperText>{'Jabatan Penatua wajib diisi'}</FormHelperText>
+              )}
+            </FormControl>
           </Grid>
         </Grid>
+
         <Grid container spacing={2} alignItems={"center"} marginTop={2}>
           <Grid size={2}>
             <InputLabel sx={{ ...layoutPrivateStyle.manageSubTitle, marginLeft: "15px" }}>
@@ -350,7 +376,6 @@ export function ManageMajelis() {
                   phoneNo: e.target.value,
                 })
               }
-              error={errors.phoneNo}
               disabled
             />
           </Grid>
@@ -367,9 +392,31 @@ export function ManageMajelis() {
                 value={awalPeriode}
                 format="DD-MMMM-YYYY"
                 onChange={handleAwalPeriodeChange}
+                minDate={awalPeriode ?? undefined}
+                onError={(error) => setErrors({ ...errors, startDate: !!error })}
                 slotProps={{
                   textField: {
                     size: "small",
+                    error: errors.startDate, // Apply error state to TextField
+                    helperText: errors.startDate ? "Awal Periode Tidak Valid" : "", // Display error message
+                    InputProps: {
+                      sx: {
+                        "& .MuiOutlinedInput-root": {
+                          borderColor: errors.startDate ? "red" : "", // Set border color to red when there's an error
+                          "&:hover": {
+                            borderColor: errors.startDate ? "red" : "", // Set border color on hover
+                          },
+                          "&.Mui-focused": {
+                            borderColor: errors.startDate ? "red" : "", // Set border color when focused
+                          },
+                        },
+                      },
+                    },
+                    InputLabelProps: {
+                      sx: {
+                        color: errors.startDate ? "red" : "", // Change label text color to red when there's an error
+                      },
+                    },
                   },
                 }}
               />
@@ -389,9 +436,30 @@ export function ManageMajelis() {
                 format="DD-MMMM-YYYY"
                 onChange={handleAkhirPeriodeChange}
                 minDate={awalPeriode ?? undefined}
+                onError={(error) => setErrors({ ...errors, endDate: !!error })}
                 slotProps={{
                   textField: {
                     size: "small",
+                    error: errors.endDate,
+                    helperText: errors.endDate ? "Akhir Periode Tidak Valid" : "",
+                    InputProps: {
+                      sx: {
+                        "& .MuiOutlinedInput-root": {
+                          borderColor: errors.endDate ? "red" : "",
+                          "&:hover": {
+                            borderColor: errors.endDate ? "red" : "",
+                          },
+                          "&.Mui-focused": {
+                            borderColor: errors.endDate ? "red" : "",
+                          },
+                        },
+                      },
+                    },
+                    InputLabelProps: {
+                      sx: {
+                        color: errors.endDate ? "red" : "",
+                      },
+                    },
                   },
                 }}
               />
